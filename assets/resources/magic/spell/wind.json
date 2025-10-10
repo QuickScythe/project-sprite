@@ -1,0 +1,8 @@
+{
+  "name": "wind",
+  "requirements": {
+    "elements": [
+      "magic:element/wind"
+    ]
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "texture": "textures:player",
+  "width": 32,
+  "height": 32,
+  "animations": {
+    "idle": "animations:player/idle",
+    "step": "animations:player/step"
+  }
+}

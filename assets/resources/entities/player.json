@@ -1,0 +1,6 @@
+{
+  "model": "models:player",
+  "name": "entity.player.name",
+  "health": 100,
+  "speed": 5.0
+}

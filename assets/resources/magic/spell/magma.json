@@ -1,0 +1,9 @@
+{
+  "name": "magma",
+  "requirements": {
+    "elements": [
+      "magic:element/fire",
+      "magic:element/earth"
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "hellfire",
+  "requirements": {
+    "elements": [
+      "magic:element/earth",
+      "magic:element/wind",
+      "magic:element/fire"
+    ]
+  }
+}

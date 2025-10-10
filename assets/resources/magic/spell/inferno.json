@@ -1,0 +1,9 @@
+{
+  "name": "inferno",
+  "requirements": {
+    "elements": [
+      "magic:element/fire",
+      "magic:element/wind"
+    ]
+  }
+}

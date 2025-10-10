@@ -1,0 +1,15 @@
+{
+  "frames": 1,
+  "speed": 63,
+  "index": 2,
+  "name": "jump",
+  "frame_data": {
+    "all": {
+      "collisions": {
+        "hit": "none",
+        "hurt": "entity_data:player/hurt",
+        "step": "entity_data:player/step"
+      }
+    }
+  }
+}

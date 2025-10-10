@@ -1,0 +1,17 @@
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+eclipse.project.name = appName + '-core'
+
+dependencies {
+  api "com.badlogicgames.gdx:gdx:$gdxVersion"
+  api "com.crashinvaders.lml:gdx-kiwi:$lmlVersion"
+  api "com.crashinvaders.lml:gdx-lml-vis:$lmlVersion"
+  api "com.crashinvaders.lml:gdx-lml:$lmlVersion"
+  api "com.kotcrab.vis:vis-ui:$visUiVersion"
+  implementation "org.json:json:$json_version"
+
+  api project(':shared')
+
+  if(enableGraalNative == 'true') {
+    implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "frames": 4,
+  "speed": 63,
+  "frame_data": {
+    "all": {
+      "collisions": {
+        "hit": "none",
+        "hurt": "entity_data:test/hurt",
+        "step": "entity_data:test/step"
+      }
+    }
+  }
+}
