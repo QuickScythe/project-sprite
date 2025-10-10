@@ -1,4 +1,3 @@
-.gitkeep
 resources/animations/player/idle.json
 resources/animations/player/jump.json
 resources/animations/player/step.json
