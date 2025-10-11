@@ -3,56 +3,49 @@ package com.sprite.resource;
 import com.badlogic.gdx.files.FileHandle;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+/**
+ * Lightweight wrapper interface providing typed access to decoded resource payloads.
+ * @param <T> payload type (e.g., JSONObject or Texture)
+ */
+public interface ResourceMeta<T> {
 
-public class ResourceMeta {
+    /**
+     * Returns the decoded payload.
+     * @return the underlying payload instance
+     */
+    T get();
 
-    private final JSONObject meta;
-    private final String path;
-    private final Type type;
+    /** Metadata wrapper for JSON resources. */
+    record Json(JSONObject json) implements ResourceMeta<JSONObject> {
 
-    public ResourceMeta(String path, FileHandle file) throws IOException {
-        this.path = path;
-        this.meta = new JSONObject(new String(file.read().readAllBytes(), StandardCharsets.UTF_8));
-        if (!meta.has("type")) throw new RuntimeException("Resource meta does not have a type");
-        type = meta.getEnum(Type.class, "type");
+        /**
+         * Creates a Json wrapper by reading and parsing the provided file as UTF-8 JSON.
+         * @param file file handle to read
+         */
+        public Json(FileHandle file) {
+            this(new JSONObject(file.readString()));
+        }
+
+        @Override
+        public JSONObject get() {
+            return json;
+        }
     }
 
-    public ResourceMeta(String path, JSONObject defaultMeta) {
-        this.path = path;
-        meta = defaultMeta;
-        if (!meta.has("type")) throw new RuntimeException("Resource meta does not have a type");
-        type = meta.getEnum(Type.class, "type");
-    }
+    /** Metadata wrapper for Texture resources. */
+    record Texture(com.badlogic.gdx.graphics.Texture texture) implements ResourceMeta<com.badlogic.gdx.graphics.Texture> {
+            /**
+             * Creates a Texture wrapper by loading the provided file as a LibGDX Texture.
+             * @param file file handle to read
+             */
+            public Texture(FileHandle file) {
+                this(new com.badlogic.gdx.graphics.Texture(file));
+            }
 
-    public <R> R get(String key, Class<R> type) {
-        return (R) meta.get(key);
-    }
+            @Override
+            public com.badlogic.gdx.graphics.Texture get() {
+                return texture;
+            }
+        }
 
-    public JSONObject json() {
-        return meta;
-    }
-
-    public String name() {
-        return path;
-    }
-
-    @Override
-    public String toString() {
-        return json().toString();
-    }
-
-    public Type type() {
-        return type;
-    }
-
-    public enum Type {
-        TEXTURE,
-        ANIMATION,
-        SOUND,
-        MUSIC,
-        BACKGROUND,
-        TEXT;
-    }
 }
