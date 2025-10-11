@@ -9,7 +9,7 @@ import org.json.JSONObject;
 /**
  * Immutable description of a renderable model, including its texture, size, and animations.
  */
-public class Model extends Resource.Object implements Cloneable {
+public class Model implements Cloneable {
 
     /** Base texture for the model. */
     public final GameSprite texture;
@@ -25,7 +25,7 @@ public class Model extends Resource.Object implements Cloneable {
      * Expected JSON format: {"texture":"textures:...","width":..,"height":..,"animations":{...}}
      * @param resource model JSON resource
      */
-    public Model(Resource<?> resource) {
+    public Model(Resource resource) {
         String read = resource.file().readString();
         JSONObject data = new JSONObject(read);
         texture = Utils.resources().TEXTURES.load(data.optString("texture", "textures:missing"));

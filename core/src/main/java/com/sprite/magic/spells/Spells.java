@@ -24,12 +24,12 @@ public class Spells {
 
     public static void initialize() {
         Resources resources = Utils.resources();
-        List<Resource<?>> spells = resources.list("magic");
+        List<Resource> spells = resources.list("magic");
         Gdx.app.log("Spells", "Loading spells...");
 
         // Load all spells first
         List<java.util.Map.Entry<String, Spell>> toRegister = new ArrayList<>();
-        for (Resource<?> resource : spells) {
+        for (Resource resource : spells) {
             if (!resource.location().path().startsWith("spell/")) continue;
             FileHandle handle = resource.file();
             String read = handle.readString();

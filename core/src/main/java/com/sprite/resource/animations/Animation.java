@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class Animation extends Resource.Object {
+public class Animation {
 
     public final int frames;
     public final int speed;
@@ -21,7 +21,7 @@ public class Animation extends Resource.Object {
     int frame = 0;
     long update = 0;
 
-    public Animation(Resource<?> resource) {
+    public Animation(Resource resource) {
         String read = resource.file().readString();
         JSONObject data = new JSONObject(read);
         this.frameData = data.getJSONObject("frame_data");

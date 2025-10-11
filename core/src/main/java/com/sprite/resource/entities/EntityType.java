@@ -6,14 +6,14 @@ import com.sprite.resource.models.Model;
 import com.sprite.utils.Utils;
 import org.json.JSONObject;
 
-public class EntityType extends Resource.Object {
+public class EntityType  {
 
     public final Model model;
     public final int health;
     public final float speed;
     public final TranslatableString name;
 
-    public EntityType(Resource<?> resource) {
+    public EntityType(Resource resource) {
         String read = resource.file().readString();
         JSONObject data = new JSONObject(read);
         model = Utils.resources().MODELS.load(data.getString("model"));

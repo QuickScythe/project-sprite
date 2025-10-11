@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * Wrapper around a LibGDX {@link Sprite} with optional hitbox/hurtbox polygons.
  */
-public class GameSprite extends Resource.Object {
+public class GameSprite {
 
     /** Optional map of polygons keyed by type. */
     Map<Polygon.Type, Polygon> polygons;
@@ -23,7 +23,7 @@ public class GameSprite extends Resource.Object {
      * Loads a texture from the given resource and wraps it in a Sprite.
      * @param resource texture resource (image file)
      */
-    public GameSprite(Resource<?> resource) {
+    public GameSprite(Resource resource) {
         sprite = new Sprite(new Texture(resource.file()));
     }
 

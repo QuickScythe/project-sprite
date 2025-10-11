@@ -28,7 +28,7 @@ import static com.sprite.resource.Resource.Type.DATA;
 public class Resources {
 
     /** Global registry of all discovered resources (json and textures). */
-    public final Registry<Resource<?>> RESOURCE_REGISTRY = Registries.register("resources", () -> null);
+    public final Registry<Resource> RESOURCE_REGISTRY = Registries.register("resources", () -> null);
     /** Registry access wrapper for models. */
     public final Resource.RegistryAccess<Model> MODELS;
     /** Registry access wrapper for animations. */
@@ -50,7 +50,7 @@ public class Resources {
                 return registry.get(location).get();
             }
             Gdx.app.log("Resource", "Loading model: " + location);
-            Resource<?> resource = Utils.resources().get(location).orElseThrow();
+            Resource resource = Utils.resources().get(location).orElseThrow();
             Model model = new Model(resource);
             registry.register(location, model);
             return model;
@@ -61,7 +61,7 @@ public class Resources {
                 return registry.get(location).get();
             }
             Gdx.app.log("Resource", "Loading animation: " + location);
-            Resource<?> resource = Utils.resources().get(location).orElseThrow();
+            Resource resource = Utils.resources().get(location).orElseThrow();
             Animation animation = new Animation(resource);
 
             registry.register(location, animation);
@@ -73,7 +73,7 @@ public class Resources {
                 return registry.get(location).get();
             }
             Gdx.app.log("Resource", "Loading texture: " + location);
-            Resource<?> resource = Utils.resources().get(location).orElseThrow();
+            Resource resource = Utils.resources().get(location).orElseThrow();
             GameSprite sprite = new GameSprite(resource);
             registry.register(location, sprite);
             return sprite;
@@ -84,7 +84,7 @@ public class Resources {
                 return registry.get(location).get();
             }
             Gdx.app.log("Resource", "Loading entity: " + location);
-            Resource<?> resource = Utils.resources().get(location).orElseThrow();
+            Resource resource = Utils.resources().get(location).orElseThrow();
             EntityType sprite = new EntityType(resource);
             registry.register(location, sprite);
             return sprite;
@@ -118,7 +118,7 @@ public class Resources {
             Gdx.app.log("Resource", "Registering internal resource: " + namespace + ":" + path);
 
             Resource.Location location = new Resource.Location(namespace, path);
-            Resource<?> resource = new Resource<>(location, Gdx.files.classpath(originalPath),  true);
+            Resource resource = new Resource(location, Gdx.files.classpath(originalPath),  true);
             RESOURCE_REGISTRY.register(location.toString(), resource);
         }
     }
@@ -147,7 +147,7 @@ public class Resources {
      * @param key registry key (e.g., "models")
      * @param load function that loads and registers an object of type T from a location
      */
-    private <T extends Resource.Object> Resource.RegistryAccess<T> registerRegistry(String key, BiFunction<String, Registry<T>, T> load) {
+    private <T> Resource.RegistryAccess<T> registerRegistry(String key, BiFunction<String, Registry<T>, T> load) {
         Gdx.app.log("Resource", "Registering resource registry: " + key);
         return new Resource.RegistryAccess<>() {
             @Override
@@ -174,9 +174,9 @@ public class Resources {
             }
 
             Resource.Location location = new Resource.Location(namespace, newPath);
-            Resource<?> resource = new Resource<>(location, file, false);
+            Resource resource = new Resource(location, file, false);
             if(RESOURCE_REGISTRY.has(location.toString())){
-                Resource<?> existing = RESOURCE_REGISTRY.get(location.toString()).orElseThrow();
+                Resource existing = RESOURCE_REGISTRY.get(location.toString()).orElseThrow();
                 if(existing.type().equals(DATA)){
                     ResourceMeta.Json existingMeta = (ResourceMeta.Json) existing.data.data();
                     JSONObject existingJson = existingMeta.get();
@@ -202,9 +202,9 @@ public class Resources {
      * @param namespace the namespace id
      * @return list of resources within the namespace
      */
-    public List<Resource<?>> list(String namespace) {
-        List<Resource<?>> resources = new ArrayList<>();
-        for (Resource<?> resource : RESOURCE_REGISTRY.values()) {
+    public List<Resource> list(String namespace) {
+        List<Resource> resources = new ArrayList<>();
+        for (Resource resource : RESOURCE_REGISTRY.values()) {
             if (resource.location().namespace().equals(namespace)) {
                 resources.add(resource);
             }
@@ -217,7 +217,7 @@ public class Resources {
      * @param resourceLocation location string
      * @return optional resource
      */
-    public Optional<Resource<?>> get(String resourceLocation) {
+    public Optional<Resource> get(String resourceLocation) {
         return RESOURCE_REGISTRY.get(resourceLocation);
     }
 }

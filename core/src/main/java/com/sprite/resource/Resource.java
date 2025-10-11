@@ -13,9 +13,8 @@ import static com.sprite.resource.Resource.Type.DATA;
  * <p>
  * A Resource couples a logical {@link Location} (namespace:path) with the physical {@link FileHandle}
  * and provides lazy decoding via {@link ResourceMeta} wrappers for JSON and Texture types.
- * @param <T> the metadata type describing the resource payload
  */
-public class Resource<T extends ResourceMeta<?>> {
+public class Resource {
 
     /** Logical resource location (namespace and path without extension). */
     public final Location location;
@@ -143,16 +142,6 @@ public class Resource<T extends ResourceMeta<?>> {
 
     }
 
-    /**
-     * Base object for JSON-serializable domain classes created from resources.
-     * Provides a readable JSON representation via {@link #toString()} for debugging.
-     */
-    public static class Object implements JsonSerializable {
 
-        @Override
-        public String toString() {
-            return json().toString(2);
-        }
-    }
 
 }

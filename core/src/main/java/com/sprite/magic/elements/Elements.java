@@ -19,9 +19,9 @@ public class Elements {
 
     public static void initialize() {
         Resources resources = Utils.resources();
-        List<Resource<?>> magic = resources.list("magic");
+        List<Resource> magic = resources.list("magic");
         int i = 0;
-        for (Resource<?> resource : magic) {
+        for (Resource resource : magic) {
             if (!resource.location().path().startsWith("element/")) continue;
             i = i + 1;
             FileHandle handle = resource.file();
@@ -35,7 +35,7 @@ public class Elements {
         Gdx.app.log("Elements", "Loaded " + i + " elements.");
     }
 
-    private static Element getElement(Resource<?> resource, String read) {
+    private static Element getElement(Resource resource, String read) {
 
         JSONObject data = new JSONObject(read);
         return new Element() {

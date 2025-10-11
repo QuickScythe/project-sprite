@@ -38,7 +38,7 @@ public class Texts {
      * Falls back to English (en_us) if the current language is not found.
      * @return language resource
      */
-    public static Resource<?> file() {
+    public static Resource file() {
         return Utils.resources().get("lang:" + tag).orElse(Utils.resources().get("lang:en_us").orElseThrow());
     }
 
@@ -47,7 +47,7 @@ public class Texts {
      * @return raw JSON object for the active language
      */
     public static JSONObject raw(){
-        Resource<?> langFile = file();
+        Resource langFile = file();
         String read = langFile.data.data().get().toString();
         return new JSONObject(read);
     }
