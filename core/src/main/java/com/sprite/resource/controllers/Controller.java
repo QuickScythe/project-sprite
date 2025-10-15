@@ -2,28 +2,38 @@ package com.sprite.resource.controllers;
 
 import com.sprite.resource.Resource;
 import com.sprite.resource.ResourceMeta;
+import com.sprite.resource.entities.EntityType;
 import com.sprite.resource.input.Input;
-import com.sprite.utils.Resources;
 import com.sprite.utils.Utils;
+import com.sprite.world.World;
+import com.sprite.world.entities.Entity;
+import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Controller implements Cloneable {
 
     Input input;
     JSONObject json;
 
-    public Controller(Resource resource){
-        if(!resource.type().equals(Resource.Type.DATA)) throw new IllegalStateException("Controller resource must be of type DATA");
+
+    public Controller(Resource resource) {
+        if (!resource.type().equals(Resource.Type.DATA))
+            throw new IllegalStateException("Controller resource must be of type DATA");
         ResourceMeta.Json data = (ResourceMeta.Json) resource.data.data();
         input = Utils.resources().INPUTS.load(data.get().getString("input"));
+
         json = new JSONObject();
-        for(String key : data.get().keySet()){
-            if(key.equalsIgnoreCase("input")) continue;
+        for (String key : data.get().keySet()) {
+            if (key.equalsIgnoreCase("input")) continue;
             json.put(key, data.get().get(key));
         }
+
     }
 
-    public Input input(){
+    public Input input() {
         return input;
     }
 
@@ -41,4 +51,6 @@ public class Controller implements Cloneable {
     public JSONObject extra() {
         return json;
     }
+
+
 }

@@ -5,5 +5,5 @@
   "speed": 5.0,
   "width": 320,
   "height": 320,
-  "controller": "controllers:find_player"
+  "controller": "controllers:player"
 }

@@ -1,5 +1,5 @@
 {
-  "model": "models:test",
+  "model": "models:player",
   "name": "entity.test.name",
   "health": 100,
   "speed": 5.0,

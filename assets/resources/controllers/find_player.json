@@ -2,7 +2,7 @@
   "input": "input:pathfinder",
   "pathfinder": {
     "targets": [
-      "entity:player"
+      "entities:player"
     ]
   }
 }

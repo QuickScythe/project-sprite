@@ -55,15 +55,39 @@ public class WorldScreen extends GameScreen {
             player.director.animation("step");
             System.out.println(player.controller.extra().toString(2));
 
+
+            camera().focus(player);
+
+            EntityType testType = Utils.resources().ENTITIES.load("entities:test");
+            Entity test = world.spawn(testType, new Random().nextInt((int) camera().viewportWidth), 32);
+            test.health(10);
+            test.director.animation("step");
+            System.out.println(test.controller.extra().toString(2));
+
             JSONObject data = Registries.dump();
             System.out.println("Registries dump:");
             System.out.println(data.toString(2));
-            camera().focus(player);
+
+
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            for(Entity entity : world.entities) {
-                world.applyForce(entity, 50, -100);
-                entity.director.animation("idle");
+            world.entities.clear();
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.D)) {
+            for (Entity entity : world.entities) {
+                if (entity.type.equals(Utils.resources().ENTITIES.load("entities:player"))) entity.jump(500);
+            }
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+            for (Entity entity : world.entities) {
+                if(entity.pathfinder() != null)
+                    entity.pathfinder().clear();
+                if (entity.type.equals(Utils.resources().ENTITIES.load("entities:player"))) entity.jump(500);
+            }
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.S)) {
+            for (Entity entity : world.entities) {
+                entity.setVelocity(-1000f, entity.getVelY());
             }
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
@@ -91,6 +115,7 @@ public class WorldScreen extends GameScreen {
 
         camera().update();
 
+
         // Render world
         world.render(this);
         // Render UI
@@ -107,13 +132,17 @@ public class WorldScreen extends GameScreen {
     }
 
     @Override
-    public void pause() { }
+    public void pause() {
+    }
 
     @Override
-    public void resume() { }
+    public void resume() {
+    }
 
     @Override
-    public void hide() { super.hide(); }
+    public void hide() {
+        super.hide();
+    }
 
     @Override
     public void dispose() {
