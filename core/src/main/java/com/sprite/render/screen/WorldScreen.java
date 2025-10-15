@@ -1,12 +1,8 @@
-package com.sprite.screen;
+package com.sprite.render.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.sprite.data.registries.Registries;
 import com.sprite.magic.elements.Element;
@@ -14,6 +10,7 @@ import com.sprite.magic.elements.Elements;
 import com.sprite.magic.spells.Spell;
 import com.sprite.magic.spells.Spells;
 import com.sprite.resource.entities.EntityType;
+import com.sprite.ui.InventoryOverlay;
 import com.sprite.utils.Utils;
 import com.sprite.world.World;
 import com.sprite.world.entities.Entity;
@@ -25,38 +22,48 @@ import java.util.Random;
 /**
  * First screen of the application. Displayed after the application is created.
  */
-public class FirstScreen extends GameScreen {
+public class WorldScreen extends GameScreen {
 
     World world = new World();
-
+    private InventoryOverlay inventory;
 
     @Override
     public void show() {
         super.show();
+        // Build a reusable overlay using the shared UI system
+        inventory = new InventoryOverlay(ui().skin());
+        inventory.setVisible(false);
+        ui().stage().addActor(inventory);
+        // Position near top-left
+        inventory.setPosition(20, ui().stage().getViewport().getWorldHeight() - inventory.getHeight() - 20);
     }
 
     @Override
     public void render(float delta) {
         ScreenUtils.clear(Color.BLACK);
-        // Draw your screen here. "delta" is the time since last render in seconds.
+        // Toggle overlay
+        if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
+            inventory.setVisible(!inventory.isVisible());
+            if (inventory.isVisible()) inventory.toFront();
+        }
+
+        // Gameplay interactions
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-
             EntityType playerType = Utils.resources().ENTITIES.load("entities:player");
-            Entity player = world.spawn(playerType, new Random().nextInt((int) camera.viewportWidth), 200);
-
-            player.health = 10;
+            Entity player = world.spawn(playerType, new Random().nextInt((int) camera().viewportWidth), 200);
+            player.health(10);
             player.director.animation("step");
-
+            System.out.println(player.controller.extra().toString(2));
 
             JSONObject data = Registries.dump();
             System.out.println("Registries dump:");
             System.out.println(data.toString(2));
+            camera().focus(player);
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             for(Entity entity : world.entities) {
-                world.applyForce(entity, 50, -50);
+                world.applyForce(entity, 50, -100);
                 entity.director.animation("idle");
-
             }
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
@@ -82,37 +89,34 @@ public class FirstScreen extends GameScreen {
             System.out.println("You cast: " + msg + "! You used: " + elems);
         }
 
-        world.render(this);
+        camera().update();
 
+        // Render world
+        world.render(this);
+        // Render UI
+        ui().actAndDraw(delta);
     }
 
     @Override
     public void resize(int width, int height) {
-        // If the window is minimized on a desktop (LWJGL3) platform, width and height are 0, which causes problems.
-        // In that case, we don't resize anything, and wait for the window to be a normal size before updating.
-        if (width <= 0 || height <= 0) {
+        super.resize(width, height);
+        if (width <= 0 || height <= 0) return;
+        if (inventory != null) {
+            inventory.setPosition(20, ui().stage().getViewport().getWorldHeight() - inventory.getHeight() - 20);
         }
-
-        // Resize your screen here. The parameters represent the new window size.
     }
 
     @Override
-    public void pause() {
-        // Invoked when your application is paused.
-    }
+    public void pause() { }
 
     @Override
-    public void resume() {
-        // Invoked when your application is resumed after pause.
-    }
+    public void resume() { }
 
     @Override
-    public void hide() {
-        // This method is called when another screen replaces this one.
-    }
+    public void hide() { super.hide(); }
 
     @Override
     public void dispose() {
-        // Destroy screen's assets here.
+        super.dispose();
     }
 }

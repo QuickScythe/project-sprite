@@ -7,7 +7,9 @@ import com.sprite.data.registries.Registry;
 import com.sprite.resource.ResourceMeta;
 import com.sprite.resource.animations.Animation;
 import com.sprite.resource.Resource;
+import com.sprite.resource.controllers.Controller;
 import com.sprite.resource.entities.EntityType;
+import com.sprite.resource.input.Input;
 import com.sprite.resource.models.Model;
 import com.sprite.resource.texture.GameSprite;
 import org.json.JSONObject;
@@ -37,6 +39,10 @@ public class Resources {
     public final Resource.RegistryAccess<GameSprite> TEXTURES;
     /** Registry access wrapper for entity types. */
     public final Resource.RegistryAccess<EntityType> ENTITIES;
+    /** Registry access wrapper for inputs. */
+    public final Resource.RegistryAccess<Input> INPUTS;
+    /** Registry access wrapper for entity controllers. */
+    public final Resource.RegistryAccess<Controller> CONTROLLERS;
 
     /**
      * Creates a Resources manager, scanning both internal (classpath) and external (local) assets
@@ -44,6 +50,30 @@ public class Resources {
      * @param rootFolder the root assets folder (e.g., "resources")
      */
     public Resources(String rootFolder) {
+        INPUTS = new Resource.RegistryAccess<>() {
+            @Override
+            public String key() {
+                return "input";
+            }
+
+            @Override
+            public Input load(String location) {
+                Input input = new Input(location);
+                registry.register(location, input);
+                return input;
+            }
+        };
+        CONTROLLERS = registerRegistry("controllers", (location, registry) -> {
+            if (registry.get(location).isPresent()) {
+                Gdx.app.debug("Resource", "Controller already loaded: " + location);
+                return registry.get(location).get();
+            }
+            Gdx.app.log("Resource", "Loading controller: " + location);
+            Resource resource = Utils.resources().get(location).orElseThrow();
+            Controller controller = new Controller(resource);
+            registry.register(location, controller);
+            return controller;
+        });
         MODELS = registerRegistry("models", (location, registry) -> {
             if (registry.get(location).isPresent()) {
                 Gdx.app.debug("Resource", "Model already loaded: " + location);

@@ -2,5 +2,8 @@
   "model": "models:player",
   "name": "entity.player.name",
   "health": 100,
-  "speed": 5.0
+  "speed": 5.0,
+  "width": 320,
+  "height": 320,
+  "controller": "controllers:find_player"
 }

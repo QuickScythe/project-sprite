@@ -1,8 +1,10 @@
 package com.sprite.utils;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Vector3;
 import com.sprite.magic.elements.Elements;
 import com.sprite.magic.spells.Spells;
+import com.sprite.world.entities.Entity;
 
 /**
  * Utility bootstrap class for initializing global systems and providing accessors.
@@ -32,5 +34,9 @@ public class Utils {
      */
     public static Resources resources() {
         return resourceManager;
+    }
+
+    public static int distance(Vector3 position, Vector3 position1) {
+        return (int) Math.sqrt(Math.pow(position.x - position1.x, 2) + Math.pow(position.y - position1.y, 2));
     }
 }

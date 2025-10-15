@@ -1,8 +1,7 @@
 package com.sprite.world;
 
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.sprite.resource.entities.EntityType;
-import com.sprite.screen.GameScreen;
+import com.sprite.render.screen.GameScreen;
 import com.sprite.world.entities.Entity;
 
 import java.util.ArrayList;
@@ -35,7 +34,7 @@ public class World {
     public Entity spawn(EntityType type, int x, int y) {
         Entity entity = new Entity(type, x, y);
         entities.add(entity);
-        Body body = new Body(entity.x(), entity.y(), entity.width(), entity.height());
+        Body body = new Body(entity.position().x, entity.position().y, entity.width(), entity.height());
         bodies.put(entity, body);
         return entity;
     }
@@ -98,7 +97,7 @@ public class World {
             b.ax = 0; b.ay = 0;
 
             // Sync entity position
-            e.setPosition(b.x, b.y);
+            e.position().set(b.x, b.y, 0);
         }
     }
 

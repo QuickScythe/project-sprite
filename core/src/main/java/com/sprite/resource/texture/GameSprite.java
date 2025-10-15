@@ -3,6 +3,7 @@ package com.sprite.resource.texture;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.sprite.resource.Resource;
+import com.sprite.resource.ResourceMeta;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -24,7 +25,9 @@ public class GameSprite {
      * @param resource texture resource (image file)
      */
     public GameSprite(Resource resource) {
-        sprite = new Sprite(new Texture(resource.file()));
+        if(!resource.type().equals(Resource.Type.TEXTURE)) throw new IllegalStateException("Controller resource must be of type TEXTURE");
+        ResourceMeta.Texture data = (ResourceMeta.Texture) resource.data.data();
+        sprite = new Sprite(data.get());
     }
 
     /**

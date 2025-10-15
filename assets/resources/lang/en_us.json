@@ -1,4 +1,5 @@
 {
   "entity.player.name": "Player",
-  "entity.test.name": "Test Entity"
+  "entity.test.name": "Test Entity",
+  "game.title": "Project Sprite"
 }

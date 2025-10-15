@@ -4,6 +4,8 @@ resources/animations/player/step.json
 resources/animations/test/idle.json
 resources/animations/test/jump.json
 resources/animations/test/step.json
+resources/controllers/find_player.json
+resources/controllers/player.json
 resources/entities/player.json
 resources/entities/test.json
 resources/entity_data/player/hit.json
@@ -12,6 +14,8 @@ resources/entity_data/player/step.json
 resources/entity_data/test/hit.json
 resources/entity_data/test/hurt.json
 resources/entity_data/test/step.json
+resources/input/keyboard.json
+resources/input/pathfinder.json
 resources/lang/en_us.json
 resources/lang/es_es.json
 resources/lang/fr_fr.json
@@ -27,3 +31,10 @@ resources/models/test.json
 resources/pack.json
 resources/textures/player.png
 resources/textures/test.png
+ui/font-list.fnt
+ui/font-subtitle.fnt
+ui/font-window.fnt
+ui/font.fnt
+ui/uiskin.atlas
+ui/uiskin.json
+ui/uiskin.png

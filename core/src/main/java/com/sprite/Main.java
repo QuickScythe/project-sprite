@@ -3,8 +3,9 @@ package com.sprite;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 import com.sprite.data.TranslatableString;
-import com.sprite.screen.FirstScreen;
-import com.sprite.screen.GameScreen;
+import com.sprite.render.screen.WorldScreen;
+import com.sprite.render.screen.MenuScreen;
+import com.sprite.render.screen.GameScreen;
 import com.sprite.utils.Texts;
 import com.sprite.utils.Utils;
 
@@ -24,7 +25,7 @@ public class Main extends Game {
      * <ul>
      *   <li>Initializes Resources, Texts, Elements and Spells via {@link Utils#initialize()}.</li>
      *   <li>Demonstrates language switching and translation lookups.</li>
-     *   <li>Sets the initial screen to {@link FirstScreen}.</li>
+     *   <li>Sets the initial screen to {@link WorldScreen}.</li>
      * </ul>
      */
     @Override
@@ -33,14 +34,14 @@ public class Main extends Game {
 
         System.out.println("Initialization Complete.");
         Texts.lang(Texts.Lang.EN_US.tag);
-        TranslatableString test = new TranslatableString("entity.test.name");
+        TranslatableString test = new TranslatableString("game.title");
         System.out.println(Texts.get(test));
         Texts.lang(Texts.Lang.FR_FR.tag);
         System.out.println(Texts.get(test));
         Texts.lang(Texts.Lang.ES_ES.tag);
         System.out.println(Texts.get(test));
 
-        setScreen(new FirstScreen());
+        setScreen(new MenuScreen());
 //        Element earth = Elements.get("magic:element/earth").orElseThrow();
 //        Element fire = Elements.get("magic:element/fire").orElseThrow();
 //        Element wind = Elements.get("magic:element/wind").orElseThrow();

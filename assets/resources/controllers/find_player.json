@@ -1,0 +1,8 @@
+{
+  "input": "input:pathfinder",
+  "pathfinder": {
+    "targets": [
+      "entity:player"
+    ]
+  }
+}

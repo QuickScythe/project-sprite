@@ -2,6 +2,7 @@ package com.sprite.resource.animations;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.sprite.resource.Resource;
+import com.sprite.resource.ResourceMeta;
 import com.sprite.resource.models.Model;
 import org.json.JSONObject;
 
@@ -22,13 +23,13 @@ public class Animation {
     long update = 0;
 
     public Animation(Resource resource) {
-        String read = resource.file().readString();
-        JSONObject data = new JSONObject(read);
-        this.frameData = data.getJSONObject("frame_data");
-        this.frames = data.getInt("frames");
-        this.speed = data.getInt("speed");
-        this.index = data.getInt("index");
-        this.name = data.optString("name", resource.location().path());
+        if(!resource.type().equals(Resource.Type.DATA)) throw new IllegalStateException("Controller resource must be of type DATA");
+        ResourceMeta.Json data = (ResourceMeta.Json) resource.data.data();
+        this.frameData = data.get().getJSONObject("frame_data");
+        this.frames = data.get().getInt("frames");
+        this.speed = data.get().getInt("speed");
+        this.index = data.get().getInt("index");
+        this.name = data.get().optString("name", resource.location().path());
 
         //todo fix:
         frameArray = new FrameData[frames];
