@@ -1,12 +1,12 @@
-package com.sprite.magic.elements;
+package com.sprite.game.magic.elements;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.sprite.data.registries.Registries;
 import com.sprite.data.registries.Registry;
 import com.sprite.resource.Resource;
-import com.sprite.utils.Resources;
-import com.sprite.utils.Utils;
+import com.sprite.data.utils.Resources;
+import com.sprite.data.utils.Utils;
 import org.json.JSONObject;
 
 import java.util.Collection;

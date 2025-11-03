@@ -2,10 +2,9 @@ package com.sprite.render.camera;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Null;
-import com.sprite.annotations.Nullable;
-import com.sprite.utils.Utils;
-import com.sprite.world.entities.Entity;
+import com.sprite.data.annotations.Nullable;
+import com.sprite.data.utils.Utils;
+import com.sprite.game.world.entities.Entity;
 
 public class GameCamera extends OrthographicCamera {
 

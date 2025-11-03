@@ -4,10 +4,8 @@ import com.sprite.data.TranslatableString;
 import com.sprite.resource.Resource;
 import com.sprite.resource.ResourceMeta;
 import com.sprite.resource.controllers.Controller;
-import com.sprite.resource.input.Input;
 import com.sprite.resource.models.Model;
-import com.sprite.utils.Utils;
-import org.json.JSONObject;
+import com.sprite.data.utils.Utils;
 
 public class EntityType  {
 

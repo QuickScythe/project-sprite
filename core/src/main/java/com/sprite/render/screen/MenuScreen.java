@@ -11,16 +11,15 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.sprite.Main;
 import com.sprite.data.TranslatableString;
-import com.sprite.utils.Texts;
+import com.sprite.data.utils.Texts;
 
 public class MenuScreen extends GameScreen{
 
     private boolean built;
 
     @Override
-    public void show() {
-        super.show();
-        System.out.println("Building UI for menu screen");
+    public void create() {
+        Gdx.app.log("UI", "Building Main Menu");
         buildUI();
     }
 
@@ -35,9 +34,9 @@ public class MenuScreen extends GameScreen{
         title.setColor(Color.WHITE);
         title.setFontScale(1f);
 
-        TextButton play = new TextButton("Play", skin);
-        TextButton options = new TextButton("Options", skin);
-        TextButton exit = new TextButton("Exit", skin);
+        TextButton play = new TextButton(Texts.get(new TranslatableString("ui.button.play")), skin);
+        TextButton options = new TextButton(Texts.get(new TranslatableString("ui.button.options")), skin);
+        TextButton exit = new TextButton(Texts.get(new TranslatableString("ui.button.exit")), skin);
 
         play.addListener(new ClickListener(){
             @Override public void clicked(InputEvent event, float x, float y) {
@@ -96,4 +95,6 @@ public class MenuScreen extends GameScreen{
     public void dispose() {
         super.dispose();
     }
+
+
 }

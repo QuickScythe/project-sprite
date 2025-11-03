@@ -1,5 +1,8 @@
 {
   "entity.player.name": "Player",
   "entity.test.name": "Test Entity",
-  "game.title": "Project Sprite"
+  "game.title": "Project Sprite",
+  "ui.button.play": "Play",
+  "ui.button.options": "Options",
+  "ui.button.exit": "Exit"
 }

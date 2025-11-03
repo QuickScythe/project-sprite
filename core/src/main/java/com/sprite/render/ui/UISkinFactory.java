@@ -1,4 +1,4 @@
-package com.sprite.ui;
+package com.sprite.render.ui;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;

@@ -1,4 +1,4 @@
-package com.sprite.magic.elements;
+package com.sprite.game.magic.elements;
 
 public interface Element {
 

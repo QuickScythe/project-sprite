@@ -57,7 +57,8 @@ public interface JsonSerializable {
                             value = number.doubleValue();
                         }
                         if(fieldType.isAnonymousClass()){
-                            System.out.println("Anonymous class detected for field: " + field.getName() + ", value: " + value);
+
+//                            System.out.println("Anonymous class detected for field: " + field.getName() + ", value: " + value);
 
                         }
                         setField(field, this, value);

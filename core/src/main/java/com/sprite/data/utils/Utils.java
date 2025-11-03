@@ -1,10 +1,9 @@
-package com.sprite.utils;
+package com.sprite.data.utils;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector3;
-import com.sprite.magic.elements.Elements;
-import com.sprite.magic.spells.Spells;
-import com.sprite.world.entities.Entity;
+import com.sprite.game.magic.elements.Elements;
+import com.sprite.game.magic.spells.Spells;
 
 /**
  * Utility bootstrap class for initializing global systems and providing accessors.

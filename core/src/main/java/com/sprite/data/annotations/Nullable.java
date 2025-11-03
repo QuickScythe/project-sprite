@@ -1,4 +1,4 @@
-package com.sprite.annotations;
+package com.sprite.data.annotations;
 
 import java.lang.annotation.*;
 

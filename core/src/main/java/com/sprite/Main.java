@@ -1,13 +1,15 @@
 package com.sprite;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.sprite.data.TranslatableString;
-import com.sprite.render.screen.WorldScreen;
-import com.sprite.render.screen.MenuScreen;
 import com.sprite.render.screen.GameScreen;
-import com.sprite.utils.Texts;
-import com.sprite.utils.Utils;
+import com.sprite.render.screen.MenuScreen;
+import com.sprite.render.screen.WorldScreen;
+import com.sprite.data.utils.Utils;
+import com.sprite.tools.EntityEditor;
+
+import java.util.Map;
 
 /**
  * Main LibGDX Game entry point shared by all platforms.
@@ -17,8 +19,17 @@ import com.sprite.utils.Utils;
  */
 public class Main extends Game {
 
-    /** The currently active GameScreen instance, if the active screen is a GameScreen. */
+    public final Map<String, String> LAUNCH_ARGS;
+
+
+    /**
+     * The currently active GameScreen instance, if the active screen is a GameScreen.
+     */
     public GameScreen screen;
+
+    public Main(Map<String, String> launchArgs) {
+        this.LAUNCH_ARGS = launchArgs;
+    }
 
     /**
      * Initializes core systems and sets the first screen.
@@ -30,30 +41,35 @@ public class Main extends Game {
      */
     @Override
     public void create() {
+        for (Map.Entry<String, String> entry : LAUNCH_ARGS.entrySet())
+            Gdx.app.log("Launcher", "Argument: " + entry.getKey() + " = " + entry.getValue());
         Utils.initialize();
-
-        System.out.println("Initialization Complete.");
-        Texts.lang(Texts.Lang.EN_US.tag);
-        TranslatableString test = new TranslatableString("game.title");
-        System.out.println(Texts.get(test));
-        Texts.lang(Texts.Lang.FR_FR.tag);
-        System.out.println(Texts.get(test));
-        Texts.lang(Texts.Lang.ES_ES.tag);
-        System.out.println(Texts.get(test));
-
-        setScreen(new MenuScreen());
-//        Element earth = Elements.get("magic:element/earth").orElseThrow();
-//        Element fire = Elements.get("magic:element/fire").orElseThrow();
-//        Element wind = Elements.get("magic:element/wind").orElseThrow();
-//        Spell[] spells = Spells.generate(earth, wind, fire);
-//
-//        for (Spell spell : spells) {
-//            System.out.println(spell.name());
-//        }
+        if (!LAUNCH_ARGS.containsKey("debugTool")){
+            setScreen(new MenuScreen());
+            return;
+        }
+        String toolName = LAUNCH_ARGS.get("debugTool");
+        if (toolName == null)
+            throw new IllegalArgumentException("Missing debug tool name.");
+        Gdx.app.log("Launcher", "Launching debug tool: " + toolName);
+        switch (toolName) {
+            case "world":
+                setScreen(new WorldScreen());
+                break;
+            case "menu":
+                setScreen(new MenuScreen());
+                break;
+            case "entityEditor":
+                setScreen(EntityEditor.screen());
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown debug tool: " + toolName);
+        }
     }
 
     /**
      * Returns the currently active GameScreen if set via {@link #setScreen(Screen)}.
+     *
      * @return the cached GameScreen or null if the active screen is not a GameScreen
      */
     public GameScreen getScreen() {
@@ -62,11 +78,12 @@ public class Main extends Game {
 
     /**
      * Sets the current {@link Screen} and caches it if it is an instance of {@link GameScreen}.
+     *
      * @param screen the screen to activate
      */
     @Override
     public void setScreen(Screen screen) {
         super.setScreen(screen);
-        if(screen instanceof GameScreen gs) this.screen = gs;
+        if (screen instanceof GameScreen gs) this.screen = gs;
     }
 }

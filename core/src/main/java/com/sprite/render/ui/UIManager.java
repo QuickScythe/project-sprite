@@ -1,4 +1,4 @@
-package com.sprite.ui;
+package com.sprite.render.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;

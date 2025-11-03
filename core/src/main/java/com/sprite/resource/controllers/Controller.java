@@ -2,16 +2,9 @@ package com.sprite.resource.controllers;
 
 import com.sprite.resource.Resource;
 import com.sprite.resource.ResourceMeta;
-import com.sprite.resource.entities.EntityType;
 import com.sprite.resource.input.Input;
-import com.sprite.utils.Utils;
-import com.sprite.world.World;
-import com.sprite.world.entities.Entity;
-import org.json.JSONArray;
+import com.sprite.data.utils.Utils;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class Controller implements Cloneable {
 

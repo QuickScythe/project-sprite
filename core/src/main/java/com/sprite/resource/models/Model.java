@@ -4,7 +4,7 @@ import com.sprite.resource.Resource;
 import com.sprite.resource.ResourceMeta;
 import com.sprite.resource.animations.Animation;
 import com.sprite.resource.texture.GameSprite;
-import com.sprite.utils.Utils;
+import com.sprite.data.utils.Utils;
 import org.json.JSONObject;
 
 /**

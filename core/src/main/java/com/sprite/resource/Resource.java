@@ -2,9 +2,10 @@ package com.sprite.resource;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.sprite.data.JsonSerializable;
 import com.sprite.data.registries.Registries;
 import com.sprite.data.registries.Registry;
+
+import java.util.Collection;
 
 import static com.sprite.resource.Resource.Type.DATA;
 
@@ -140,6 +141,9 @@ public class Resource {
          */
         public abstract T load(String location);
 
+        public Collection<T> all() {
+            return registry.values();
+        }
     }
 
 

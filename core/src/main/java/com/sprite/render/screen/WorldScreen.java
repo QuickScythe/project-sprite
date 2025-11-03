@@ -5,15 +5,15 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.sprite.data.registries.Registries;
-import com.sprite.magic.elements.Element;
-import com.sprite.magic.elements.Elements;
-import com.sprite.magic.spells.Spell;
-import com.sprite.magic.spells.Spells;
+import com.sprite.data.utils.Utils;
+import com.sprite.game.magic.elements.Element;
+import com.sprite.game.magic.elements.Elements;
+import com.sprite.game.magic.spells.Spell;
+import com.sprite.game.magic.spells.Spells;
+import com.sprite.game.world.World;
+import com.sprite.game.world.entities.Entity;
+import com.sprite.render.ui.InventoryOverlay;
 import com.sprite.resource.entities.EntityType;
-import com.sprite.ui.InventoryOverlay;
-import com.sprite.utils.Utils;
-import com.sprite.world.World;
-import com.sprite.world.entities.Entity;
 import org.json.JSONObject;
 
 import java.util.Objects;
@@ -28,8 +28,7 @@ public class WorldScreen extends GameScreen {
     private InventoryOverlay inventory;
 
     @Override
-    public void show() {
-        super.show();
+    public void create() {
         // Build a reusable overlay using the shared UI system
         inventory = new InventoryOverlay(ui().skin());
         inventory.setVisible(false);
@@ -80,8 +79,7 @@ public class WorldScreen extends GameScreen {
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
             for (Entity entity : world.entities) {
-                if(entity.pathfinder() != null)
-                    entity.pathfinder().clear();
+                if (entity.pathfinder() != null) entity.pathfinder().clear();
                 if (entity.type.equals(Utils.resources().ENTITIES.load("entities:player"))) entity.jump(500);
             }
         }
@@ -148,4 +146,6 @@ public class WorldScreen extends GameScreen {
     public void dispose() {
         super.dispose();
     }
+
+
 }

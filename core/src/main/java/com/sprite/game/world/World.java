@@ -1,8 +1,8 @@
-package com.sprite.world;
+package com.sprite.game.world;
 
 import com.sprite.resource.entities.EntityType;
 import com.sprite.render.screen.GameScreen;
-import com.sprite.world.entities.Entity;
+import com.sprite.game.world.entities.Entity;
 
 import java.util.ArrayList;
 import java.util.List;

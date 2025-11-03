@@ -1,4 +1,4 @@
-package com.sprite.utils;
+package com.sprite.data.utils;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -217,7 +217,6 @@ public class Resources {
                     Gdx.app.log("Resource", "Merged resource data for: " + location);
                     ResourceMeta.Json newMeta = new ResourceMeta.Json(existingJson);
                     Resource.Data newData = new Resource.Data(DATA, newMeta);
-                    System.out.println(newData.data().get().toString());
                     resource.data(newData);
 
                 }

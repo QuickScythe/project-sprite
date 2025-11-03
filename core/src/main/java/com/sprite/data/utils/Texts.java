@@ -1,4 +1,4 @@
-package com.sprite.utils;
+package com.sprite.data.utils;
 
 import com.badlogic.gdx.Gdx;
 import com.sprite.data.TranslatableString;

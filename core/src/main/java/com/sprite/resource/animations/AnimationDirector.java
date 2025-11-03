@@ -3,10 +3,9 @@ package com.sprite.resource.animations;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.sprite.data.registries.Registry;
 import com.sprite.data.registries.RegistryKey;
-import com.sprite.world.entities.Entity;
+import com.sprite.game.world.entities.Entity;
 
 import java.util.Date;
-import java.util.Map;
 
 public class AnimationDirector {
 

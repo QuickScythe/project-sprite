@@ -1,9 +1,9 @@
-package com.sprite.world.entities;
+package com.sprite.game.world.entities;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
-import com.sprite.annotations.Nullable;
+import com.sprite.data.annotations.Nullable;
 import com.sprite.data.TranslatableString;
 import com.sprite.render.screen.GameScreen;
 import com.sprite.resource.animations.Animation;
@@ -11,8 +11,8 @@ import com.sprite.resource.animations.AnimationDirector;
 import com.sprite.resource.controllers.Controller;
 import com.sprite.resource.entities.EntityType;
 import com.sprite.resource.models.Model;
-import com.sprite.utils.Utils;
-import com.sprite.world.World;
+import com.sprite.data.utils.Utils;
+import com.sprite.game.world.World;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
