@@ -79,6 +79,7 @@ public class Texts {
     /** Supported built-in language tags. */
     public enum Lang {
         EN_US("en_us"),
+        EN_PS("en_ps"),
         EN_UK("en_uk"),
         ES_ES("es_es"),
         FR_FR("fr_fr"),

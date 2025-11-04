@@ -16,9 +16,8 @@ resources/entity_data/test/hurt.json
 resources/entity_data/test/step.json
 resources/input/keyboard.json
 resources/input/pathfinder.json
+resources/lang/en_ps.json
 resources/lang/en_us.json
-resources/lang/es_es.json
-resources/lang/fr_fr.json
 resources/magic/element/earth.json
 resources/magic/element/fire.json
 resources/magic/element/wind.json
