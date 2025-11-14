@@ -1,9 +1,10 @@
 package com.sprite.data.utils;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.math.Vector3;
-import com.sprite.game.magic.elements.Elements;
-import com.sprite.game.magic.spells.Spells;
+import com.sprite.resource.magic.elements.Elements;
+import com.sprite.resource.magic.spells.Spells;
 
 /**
  * Utility bootstrap class for initializing global systems and providing accessors.
@@ -12,6 +13,7 @@ public class Utils {
 
     /** Global resource manager instance. */
     private static Resources resourceManager;
+    private static Preferences settings;
 
     /**
      * Initializes core subsystems: resource registry, text localization, elements and spells.
@@ -20,11 +22,17 @@ public class Utils {
     public static void initialize() {
         resourceManager = new Resources("resources");
         Texts.init();
+        settings = Gdx.app.getPreferences("player_settings");
+        Texts.lang(Texts.Lang.get(settings.getString("language", Texts.Lang.EN_US.tag)), false);
 
         Elements.initialize();
         Spells.initialize();
 
         Gdx.app.log("Initialization", "Resources Initialized. Game ready to launch");
+    }
+
+    public static Preferences settings(){
+        return settings;
     }
 
     /**

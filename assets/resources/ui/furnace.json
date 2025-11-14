@@ -1,0 +1,12 @@
+{
+  "type": "inventory",
+  "texture": "textures:inventory/furnace",
+  "inventory": {
+    "#comment1": "size is optional. Default is 32. Refers to the size of the each inventory grid cell.",
+    "size": 16,
+    "width": 3,
+    "height": 3,
+    "#comment2": "hidden is optional. Default is empty. Refers to the indexes of the inventory slots that should be hidden.",
+    "hidden": [1,2,3,4,7,8]
+  }
+}

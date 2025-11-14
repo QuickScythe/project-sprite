@@ -1,7 +1,7 @@
-package com.sprite.game.magic.spells;
+package com.sprite.resource.magic.spells;
 
 
-import com.sprite.game.magic.elements.Element;
+import com.sprite.resource.magic.elements.Element;
 
 public interface Spell {
 

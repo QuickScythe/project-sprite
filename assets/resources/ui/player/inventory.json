@@ -1,0 +1,8 @@
+{
+  "type": "inventory",
+  "texture": "textures:player_inventory",
+  "inventory": {
+    "width": 9,
+    "height": 4
+  }
+}

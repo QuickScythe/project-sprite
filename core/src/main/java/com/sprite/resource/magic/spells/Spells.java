@@ -1,12 +1,12 @@
-package com.sprite.game.magic.spells;
+package com.sprite.resource.magic.spells;
 
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.sprite.data.registries.Registries;
 import com.sprite.data.registries.Registry;
-import com.sprite.game.magic.elements.Element;
-import com.sprite.game.magic.elements.Elements;
+import com.sprite.resource.magic.elements.Element;
+import com.sprite.resource.magic.elements.Elements;
 import com.sprite.resource.Resource;
 import com.sprite.data.utils.Resources;
 import com.sprite.data.utils.Utils;

@@ -17,31 +17,53 @@ import static com.sprite.resource.Resource.Type.DATA;
  */
 public class Resource {
 
-    /** Logical resource location (namespace and path without extension). */
+    /**
+     * Logical resource location (namespace and path without extension).
+     */
     public final Location location;
-    /** Physical file backing this resource. */
+    /**
+     * Physical file backing this resource.
+     */
     public final FileHandle file;
-    /** Whether this resource originates from internal classpath assets. */
+    /**
+     * Whether this resource originates from internal classpath assets.
+     */
     public final boolean internal;
-    /** Decoded data wrapper associated with this resource. */
+    /**
+     * Decoded data wrapper associated with this resource.
+     */
     public Data data;
 
     /**
      * Creates a new Resource.
+     *
      * @param location logical namespace:path identifier
-     * @param file the backing file handle
+     * @param file     the backing file handle
      * @param internal true if sourced from internal classpath, false for external/local assets
      */
     public Resource(Location location, FileHandle file, boolean internal) {
         this.location = location;
         this.internal = internal;
         this.file = file;
+        switch (type()) {
+            case TEXTURE ->{
+                if(!file.extension().equals("png"))
+                    throw new IllegalArgumentException("Texture file must be a PNG imag: " + file.path());
+                this.data = new Data(type(), new ResourceMeta.Texture(file));
+            }
+            case DATA ->{
+                if(!file.extension().equals("json"))
+                    throw new IllegalArgumentException("JSON file must be a JSON file: " + file.path());
+                this.data = new Data(type(), new ResourceMeta.Json(file));
+            }
+        }
         this.data = new Data(type(), type() == DATA ? new ResourceMeta.Json(file) : new ResourceMeta.Texture(file));
 
     }
 
     /**
      * Returns the logical location of this resource.
+     *
      * @return location record
      */
     public Location location() {
@@ -50,6 +72,7 @@ public class Resource {
 
     /**
      * Returns the file handle for this resource.
+     *
      * @return file handle
      */
     public FileHandle file() {
@@ -58,6 +81,7 @@ public class Resource {
 
     /**
      * Indicates whether this resource is internal.
+     *
      * @return true if classpath/internal, false if external/local
      */
     public boolean isInternal() {
@@ -66,6 +90,7 @@ public class Resource {
 
     /**
      * Detects the resource type based on the file extension.
+     *
      * @return DATA for .json files, otherwise TEXTURE
      */
     public Type type() {
@@ -74,21 +99,30 @@ public class Resource {
 
     /**
      * Overrides the decoded data wrapper for this resource (e.g., after merging JSON).
+     *
      * @param data new data wrapper
      */
     public void data(Data data) {
         this.data = data;
     }
 
-    /** Supported resource payload types. */
+    /**
+     * Supported resource payload types.
+     */
     public enum Type {
-        /** JSON-based descriptive data. */
+        /**
+         * JSON-based descriptive data.
+         */
         DATA,
-        /** Texture-based image data. */
+        /**
+         * Texture-based image data.
+         */
         TEXTURE
     }
 
-    /** Pair of type and decoded metadata of the resource. */
+    /**
+     * Pair of type and decoded metadata of the resource.
+     */
     public record Data(Type type, ResourceMeta<?> data) {
     }
 
@@ -104,6 +138,7 @@ public class Resource {
 
         /**
          * Resolves a FileHandle by searching local assets first and falling back to internal assets.
+         *
          * @return a FileHandle pointing to the resolved file (without extension matching either local or internal)
          */
         public FileHandle file() {
@@ -124,18 +159,24 @@ public class Resource {
 
     /**
      * Base for resource-specific registries that know how to load objects of type T from a resource location.
+     *
      * @param <T> the object type stored in the registry
      */
     public abstract static class RegistryAccess<T extends Object> {
 
-        /** The backing registry for this resource domain. */
+        /**
+         * The backing registry for this resource domain.
+         */
         public final Registry<T> registry = Registries.register(key(), () -> null);
 
-        /** @return the registry key (e.g., "models", "animations"). */
+        /**
+         * @return the registry key (e.g., "models", "animations").
+         */
         public abstract String key();
 
         /**
          * Loads an object of type T from a resource location and registers it.
+         *
          * @param location resource location string (namespace:path)
          * @return loaded object instance
          */
@@ -145,7 +186,6 @@ public class Resource {
             return registry.values();
         }
     }
-
 
 
 }

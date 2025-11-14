@@ -40,14 +40,18 @@ public class MenuScreen extends GameScreen{
 
         play.addListener(new ClickListener(){
             @Override public void clicked(InputEvent event, float x, float y) {
+//                Main main = (Main) Gdx.app.getApplicationListener();
+//                main.setScreen(new WorldScreen());
+                Texts.lang(Texts.Lang.EN_PS, true);
                 Main main = (Main) Gdx.app.getApplicationListener();
-                main.setScreen(new WorldScreen());
+                main.setScreen(new MenuScreen());
+
             }
         });
         options.addListener(new ClickListener(){
             @Override public void clicked(InputEvent event, float x, float y) {
                 // Placeholder: could push an options window here
-                Texts.lang(Texts.Lang.EN_US.tag);
+                Texts.lang(Texts.Lang.EN_US, true);
                 Main main = (Main) Gdx.app.getApplicationListener();
                 main.setScreen(new MenuScreen());
             }
@@ -67,11 +71,7 @@ public class MenuScreen extends GameScreen{
         built = true;
     }
 
-    @Override
-    public void render(float delta) {
-        ScreenUtils.clear(0.1f, 0.1f, 0.12f, 1f);
-        ui().actAndDraw(delta);
-    }
+
 
     @Override
     public void resize(int width, int height) {

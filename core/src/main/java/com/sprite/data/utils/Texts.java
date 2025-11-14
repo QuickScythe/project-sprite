@@ -54,12 +54,18 @@ public class Texts {
 
     /**
      * Switches the active language and re-initializes the cache.
-     * @param languageTag IETF language tag (e.g., "fr-FR" or "fr_fr")
+     * @param lang new language to switch to
+     * @param flushSettings whether to save the new language to settings
      */
-    public static void lang(String languageTag){
-        tag = languageTag.replace("-", "_").toLowerCase(Locale.ROOT);
+    public static void lang(Lang lang, boolean flushSettings){
+        tag = lang.tag;
         Gdx.app.log("Language", "Switched language to: " + tag);
         init();
+        if(flushSettings) {
+            Utils.settings().putString("language", lang.tag);
+            Utils.settings().flush();
+        }
+
     }
 
     /**
@@ -92,6 +98,13 @@ public class Texts {
 
         Lang(String tag) {
             this.tag = tag;
+        }
+
+        public static Lang get(String language) {
+            for(Lang lang : Lang.values()) {
+                if(lang.tag.equals(language)) return lang;
+            }
+            return Lang.EN_US;
         }
     }
 }

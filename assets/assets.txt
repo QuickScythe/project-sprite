@@ -28,8 +28,12 @@ resources/magic/spell/wind.json
 resources/models/player.json
 resources/models/test.json
 resources/pack.json
+resources/textures/inventory/furnace.png
+resources/textures/missing.png
 resources/textures/player.png
 resources/textures/test.png
+resources/ui/furnace.json
+resources/ui/player/inventory.json
 ui/font-list.fnt
 ui/font-subtitle.fnt
 ui/font-window.fnt

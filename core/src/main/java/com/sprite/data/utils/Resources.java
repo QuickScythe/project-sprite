@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.sprite.data.registries.Registries;
 import com.sprite.data.registries.Registry;
+import com.sprite.render.ui.UIDefinition;
 import com.sprite.resource.ResourceMeta;
 import com.sprite.resource.animations.Animation;
 import com.sprite.resource.Resource;
@@ -43,6 +44,8 @@ public class Resources {
     public final Resource.RegistryAccess<Input> INPUTS;
     /** Registry access wrapper for entity controllers. */
     public final Resource.RegistryAccess<Controller> CONTROLLERS;
+    /** Registry access wrapper for UIs. */
+    public final Resource.RegistryAccess<UIDefinition> USER_INTERFACES;
 
     /**
      * Creates a Resources manager, scanning both internal (classpath) and external (local) assets
@@ -50,6 +53,25 @@ public class Resources {
      * @param rootFolder the root assets folder (e.g., "resources")
      */
     public Resources(String rootFolder) {
+        USER_INTERFACES = new Resource.RegistryAccess<>() {
+            @Override
+            public String key() {
+                return "ui";
+            }
+
+            @Override
+            public UIDefinition load(String location) {
+                if (registry.get(location).isPresent()) {
+                Gdx.app.debug("Resource", "UI already loaded: " + location);
+                return registry.get(location).get();
+            }
+                Gdx.app.log("Resource", "Loading UI: " + location);
+                Resource resource = Utils.resources().get(location).orElseThrow();
+                UIDefinition uidef = new UIDefinition(resource);
+                registry.register(location, uidef);
+                return uidef;
+            }
+        };
         INPUTS = new Resource.RegistryAccess<>() {
             @Override
             public String key() {
@@ -103,7 +125,7 @@ public class Resources {
                 return registry.get(location).get();
             }
             Gdx.app.log("Resource", "Loading texture: " + location);
-            Resource resource = Utils.resources().get(location).orElseThrow();
+            Resource resource = Utils.resources().get(location).orElse(Utils.resources().get("textures:missing").orElseThrow());
             GameSprite sprite = new GameSprite(resource);
             registry.register(location, sprite);
             return sprite;

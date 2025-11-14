@@ -1,4 +1,4 @@
-package com.sprite.game.magic.elements;
+package com.sprite.resource.magic.elements;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;

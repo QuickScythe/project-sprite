@@ -3,7 +3,7 @@
   "width": 32,
   "height": 32,
   "animations": {
-    "idle": "animations:test/idle",
-    "step": "animations:test/step"
+    "idle": "animations:player/idle",
+    "step": "animations:player/step"
   }
 }

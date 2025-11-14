@@ -2,6 +2,7 @@ package com.sprite;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.sprite.data.utils.Texts;
 import com.sprite.render.screen.GameScreen;
@@ -9,6 +10,7 @@ import com.sprite.render.screen.MenuScreen;
 import com.sprite.render.screen.WorldScreen;
 import com.sprite.data.utils.Utils;
 import com.sprite.tools.EntityEditor;
+import com.sprite.tools.InventoryEditor;
 
 import java.util.Map;
 
@@ -45,6 +47,8 @@ public class Main extends Game {
         for (Map.Entry<String, String> entry : LAUNCH_ARGS.entrySet())
             Gdx.app.log("Launcher", "Argument: " + entry.getKey() + " = " + entry.getValue());
         Utils.initialize();
+
+
 //        Texts.lang(Texts.Lang.EN_PS.tag);
         if (!LAUNCH_ARGS.containsKey("debugTool")){
             setScreen(new MenuScreen());
@@ -63,6 +67,9 @@ public class Main extends Game {
                 break;
             case "entityEditor":
                 setScreen(EntityEditor.screen());
+                break;
+            case "inventoryEditor":
+                setScreen(InventoryEditor.screen());
                 break;
             default:
                 throw new IllegalArgumentException("Unknown debug tool: " + toolName);
