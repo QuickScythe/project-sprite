@@ -2,7 +2,7 @@
   "type": "inventory",
   "texture": "textures:inventory/furnace",
   "inventory": {
-    "#comment1": "size is optional. Default is 32. Refers to the size of the each inventory grid cell.",
+    "#comment1": "size is optional. Default is 16. Refers to the size of the each inventory grid cell.",
     "size": 16,
     "width": 3,
     "height": 3,

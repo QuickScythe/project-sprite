@@ -1,18 +1,7 @@
 package com.sprite.tools;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.sprite.data.utils.Texts;
 import com.sprite.data.utils.Utils;
 import com.sprite.render.screen.GameScreen;
 import com.sprite.resource.Resource;
@@ -56,42 +45,42 @@ public class EntityEditor {
 
         private void buildUI() {
             if (built) return;
-            Skin skin = ui().skin();
-            Table root = new Table(skin);
-            root.setFillParent(true);
-            root.defaults().pad(8f).width(240).height(48);
+//            Skin skin = ui().skin();
+//            Table root = new Table(skin);
+//            root.setFillParent(true);
+//            root.defaults().pad(8f).width(240).height(48);
+//
+//
+//            for (EntityType type : Utils.resources().ENTITIES.all()) {
+//
+//                 Image + Label
+//                TextureRegion region = new TextureRegion(type.model.animations[0].frame(type.model));
+//                Image image = new Image(new TextureRegionDrawable(region));
+//                Label label = new Label(Texts.get(type.name), skin);
+//
+//                 Compose them in a Table and make it clickable
+//                Table row = new Table(skin);
+//                row.setTouchable(Touchable.enabled);
+//                 Optional: use a background drawable from your skin (e.g., button background)
+//                 Use the drawables defined in uiskin.atlas/uiskin.json: button-normal, button-normal-over, button-normal-pressed
+//                if (skin.has("button-normal", Drawable.class)) {
+//                    row.setBackground(skin.getDrawable("button-normal"));
+//                }
+//                row.add(image).size(32).pad(8).left();
+//                row.add(label).pad(8).left();
+//                row.pack();
+//
+//                row.addListener(new ClickListener() {
+//                    @Override
+//                    public void clicked(InputEvent event, float x, float y) {
+//                        EntityEditor.Screen.this.type = type;
+//                    }
+//                });
+//
+//                root.add(row);
+//            }
 
-
-            for (EntityType type : Utils.resources().ENTITIES.all()) {
-
-                // Image + Label
-                TextureRegion region = new TextureRegion(type.model.animations[0].frame(type.model));
-                Image image = new Image(new TextureRegionDrawable(region));
-                Label label = new Label(Texts.get(type.name), skin);
-
-                // Compose them in a Table and make it clickable
-                Table row = new Table(skin);
-                row.setTouchable(Touchable.enabled);
-                // Optional: use a background drawable from your skin (e.g., button background)
-                // Use the drawables defined in uiskin.atlas/uiskin.json: button-normal, button-normal-over, button-normal-pressed
-                if (skin.has("button-normal", Drawable.class)) {
-                    row.setBackground(skin.getDrawable("button-normal"));
-                }
-                row.add(image).size(32).pad(8).left();
-                row.add(label).pad(8).left();
-                row.pack();
-
-                row.addListener(new ClickListener() {
-                    @Override
-                    public void clicked(InputEvent event, float x, float y) {
-                        EntityEditor.Screen.this.type = type;
-                    }
-                });
-
-                root.add(row);
-            }
-
-            ui().stage().addActor(root);
+//            ui().stage().addActor(root);
             built = true;
         }
 
@@ -100,7 +89,7 @@ public class EntityEditor {
         public void render(float delta) {
             ScreenUtils.clear(Color.BLACK);
             if (type == null) {
-                ui().actAndDraw(delta);
+                ui().draw();
                 return;
             }
 
@@ -127,12 +116,22 @@ public class EntityEditor {
         }
 
         @Override
+        public void resize(int width, int height) {
+
+        }
+
+        @Override
         public void pause() {
 
         }
 
         @Override
         public void resume() {
+
+        }
+
+        @Override
+        public void hide() {
 
         }
 

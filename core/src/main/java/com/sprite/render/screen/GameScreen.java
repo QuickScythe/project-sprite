@@ -6,13 +6,20 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.sprite.input.InputSystem;
 import com.sprite.render.RenderPipeline;
 import com.sprite.render.camera.GameCamera;
-import com.sprite.render.ui.UIManager;
+import com.sprite.render.ui.UI;
+import com.sprite.resource.ui.UIType;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class GameScreen implements Screen {
 
     protected UIManager ui;
+    Map<Integer, UI<? extends UIType>> uis = new HashMap<>();
+    UIManager uiManager = new UIManager();
     private GameCamera camera;
     private ShapeRenderer debugRenderer;
     private SpriteBatch sprite;
@@ -26,7 +33,9 @@ public abstract class GameScreen implements Screen {
         sprite = new SpriteBatch();
         ui = new UIManager();
         font = new BitmapFont();
-        renderPipeline = new RenderPipeline(){
+        // Increase default UI font scale for better legibility on high resolutions
+        font.getData().setScale(2f);
+        renderPipeline = new RenderPipeline() {
 
             @Override
             public void background() {
@@ -90,36 +99,19 @@ public abstract class GameScreen implements Screen {
         return camera;
     }
 
-    public UIManager ui() {
-        return ui;
-    }
-
-    @Override
-    public void resize(int width, int height) {
-        if (ui != null) ui.resize(width, height);
-    }
-
-    @Override
-    public void hide() {
-        // Detach UI input when screen is no longer active to prevent input leakage between screens
-        if (ui != null) {
-            ui.detachFromInput();
-            // Optional: clear actors to free references early
-            if (ui.stage() != null) ui.stage().clear();
-        }
-    }
-
     @Override
     public void dispose() {
         if (sprite != null) sprite.dispose();
         if (debugRenderer != null) debugRenderer.dispose();
-        if (ui != null) ui.dispose();
     }
 
     public abstract void create();
 
     @Override
     public void render(float delta) {
+        // Update high-level input first so just-pressed works for this frame
+        InputSystem.i().update(delta);
+
         ScreenUtils.clear(color);
         renderPipeline.background();
         renderPipeline.backgroundShaders();
@@ -128,12 +120,48 @@ public abstract class GameScreen implements Screen {
         renderPipeline.ui();
         renderPipeline.uiShader();
 
-        ui().actAndDraw(delta);
+        ui().draw();
+
+//        ui().actAndDraw(delta);
     }
 
+    public UIManager ui() {
+        return uiManager;
+    }
 
+    public class UIManager {
 
+        public void draw() {
+            for (int i = 1; i <= uis.size(); i++) {
+                if (uis.get(i) != null) uis.get(i).draw(GameScreen.this);
+            }
+        }
 
+        public void addFirst(UI<? extends UIType> ui) {
+            final int firstSize = uis.size();
+            System.out.println("Adding UI at index " + firstSize);
+            for (int i = firstSize; i > 0; i--) {
+                System.out.println("Moving UI at index " + i + " to index " + (i + 1));
+                uis.put(i + 1, uis.get(i));
+            }
+            System.out.println("Adding UI at index 1");
+            uis.put(1, ui);
+        }
 
+        public void add(UI<? extends UIType> ui) {
+            uis.put(uis.size() + 1, ui);
+        }
 
+        public void remove(int index) {
+            uis.remove(index);
+        }
+
+        public void clear() {
+            uis.clear();
+        }
+
+        public int size() {
+            return uis.size();
+        }
+    }
 }

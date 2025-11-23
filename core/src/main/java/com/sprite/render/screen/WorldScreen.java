@@ -6,14 +6,13 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.sprite.data.registries.Registries;
 import com.sprite.data.utils.Utils;
+import com.sprite.game.world.World;
+import com.sprite.game.world.entities.Entity;
+import com.sprite.resource.entities.EntityType;
 import com.sprite.resource.magic.elements.Element;
 import com.sprite.resource.magic.elements.Elements;
 import com.sprite.resource.magic.spells.Spell;
 import com.sprite.resource.magic.spells.Spells;
-import com.sprite.game.world.World;
-import com.sprite.game.world.entities.Entity;
-import com.sprite.render.ui.InventoryOverlay;
-import com.sprite.resource.entities.EntityType;
 import org.json.JSONObject;
 
 import java.util.Objects;
@@ -25,26 +24,19 @@ import java.util.Random;
 public class WorldScreen extends GameScreen {
 
     World world = new World();
-    private InventoryOverlay inventory;
 
     @Override
     public void create() {
-        // Build a reusable overlay using the shared UI system
-        inventory = new InventoryOverlay(ui().skin());
-        inventory.setVisible(false);
-        ui().stage().addActor(inventory);
-        // Position near top-left
-        inventory.setPosition(20, ui().stage().getViewport().getWorldHeight() - inventory.getHeight() - 20);
     }
 
     @Override
     public void render(float delta) {
         ScreenUtils.clear(Color.BLACK);
         // Toggle overlay
-        if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
-            inventory.setVisible(!inventory.isVisible());
-            if (inventory.isVisible()) inventory.toFront();
-        }
+//        if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
+//            inventory.setVisible(!inventory.isVisible());
+//            if (inventory.isVisible()) inventory.toFront();
+//        }
 
         // Gameplay interactions
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
@@ -117,29 +109,27 @@ public class WorldScreen extends GameScreen {
         // Render world
         world.render(this);
         // Render UI
-        ui().actAndDraw(delta);
+        ui().draw();
     }
 
     @Override
     public void resize(int width, int height) {
-        super.resize(width, height);
-        if (width <= 0 || height <= 0) return;
-        if (inventory != null) {
-            inventory.setPosition(20, ui().stage().getViewport().getWorldHeight() - inventory.getHeight() - 20);
-        }
+
     }
 
     @Override
     public void pause() {
+
     }
 
     @Override
     public void resume() {
+
     }
 
     @Override
     public void hide() {
-        super.hide();
+
     }
 
     @Override

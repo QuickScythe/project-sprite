@@ -2,15 +2,13 @@ package com.sprite;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
-import com.sprite.data.utils.Texts;
 import com.sprite.render.screen.GameScreen;
 import com.sprite.render.screen.MenuScreen;
 import com.sprite.render.screen.WorldScreen;
 import com.sprite.data.utils.Utils;
 import com.sprite.tools.EntityEditor;
-import com.sprite.tools.InventoryEditor;
+import com.sprite.tools.UIEditor;
 
 import java.util.Map;
 
@@ -32,6 +30,23 @@ public class Main extends Game {
 
     public Main(Map<String, String> launchArgs) {
         this.LAUNCH_ARGS = launchArgs;
+    }
+
+    @Override
+    public void dispose() {
+        // Dispose current screen and global resources to ensure clean shutdown
+        try {
+            Screen current = getScreen();
+            if (current != null) current.dispose();
+        } catch (Throwable t) {
+            Gdx.app.error("Shutdown", "Error disposing screen", t);
+        }
+        try {
+            Utils.shutdown();
+        } catch (Throwable t) {
+            Gdx.app.error("Shutdown", "Error during global shutdown", t);
+        }
+        super.dispose();
     }
 
     /**
@@ -69,7 +84,7 @@ public class Main extends Game {
                 setScreen(EntityEditor.screen());
                 break;
             case "inventoryEditor":
-                setScreen(InventoryEditor.screen());
+                setScreen(UIEditor.screen());
                 break;
             default:
                 throw new IllegalArgumentException("Unknown debug tool: " + toolName);

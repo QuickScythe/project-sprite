@@ -15,6 +15,8 @@ import java.util.Map;
  */
 public class GameSprite {
 
+    private boolean disposed = false;
+
     /** Optional map of polygons keyed by type. */
     Map<Polygon.Type, Polygon> polygons;
     /** Underlying LibGDX sprite. */
@@ -25,7 +27,7 @@ public class GameSprite {
      * @param resource texture resource (image file)
      */
     public GameSprite(Resource resource) {
-        if(!resource.type().equals(Resource.Type.TEXTURE)) throw new IllegalStateException("Controller resource must be of type TEXTURE");
+        if(!resource.type().equals(Resource.Type.TEXTURE)) throw new IllegalStateException("GameSprite resource must be of type TEXTURE");
         ResourceMeta.Texture data = (ResourceMeta.Texture) resource.data.data();
         sprite = new Sprite(data.get());
     }
@@ -49,6 +51,14 @@ public class GameSprite {
     /** @return the underlying LibGDX Sprite. */
     public Sprite sprite() {
         return sprite;
+    }
+
+    /** Disposes the underlying Texture if not already disposed. */
+    public void dispose() {
+        if (!disposed && sprite != null && sprite.getTexture() != null) {
+            sprite.getTexture().dispose();
+            disposed = true;
+        }
     }
 
     /** @return the sprite width in pixels. */

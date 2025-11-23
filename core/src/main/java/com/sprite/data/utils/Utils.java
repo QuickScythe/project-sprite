@@ -14,6 +14,7 @@ public class Utils {
     /** Global resource manager instance. */
     private static Resources resourceManager;
     private static Preferences settings;
+    private static boolean shutdown = false;
 
     /**
      * Initializes core subsystems: resource registry, text localization, elements and spells.
@@ -41,6 +42,22 @@ public class Utils {
      */
     public static Resources resources() {
         return resourceManager;
+    }
+
+    /**
+     * Shuts down global systems, disposing resources and clearing registries.
+     * Safe to call multiple times.
+     */
+    public static void shutdown() {
+        if (shutdown) return;
+        shutdown = true;
+        try {
+            if (resourceManager != null) resourceManager.dispose();
+        } catch (Throwable t) {
+            Gdx.app.error("Shutdown", "Error disposing resources", t);
+        } finally {
+            resourceManager = null;
+        }
     }
 
     public static int distance(Vector3 position, Vector3 position1) {

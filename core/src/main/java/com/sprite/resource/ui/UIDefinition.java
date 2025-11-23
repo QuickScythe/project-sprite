@@ -1,17 +1,17 @@
-package com.sprite.render.ui;
+package com.sprite.resource.ui;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.sprite.data.TranslatableString;
-import com.sprite.data.utils.Utils;
 import com.sprite.render.screen.GameScreen;
 import com.sprite.resource.Resource;
 import com.sprite.resource.ResourceMeta;
-import com.sprite.resource.texture.GameSprite;
+import org.json.JSONObject;
+
+import java.awt.*;
 
 public class UIDefinition {
 
     private final UIType type;
-    Resource.Location texture;
+    private final Resource.Location texture;
+    private final JSONObject data;
 
 
     public UIDefinition(Resource resource) {
@@ -24,15 +24,26 @@ public class UIDefinition {
         else if(rawType.equalsIgnoreCase("dialog"))
             type = new DialogUI();
         else throw new IllegalArgumentException("Unknown UI type: " + rawType);
+
         String full = data.get().getString("texture");
         String[] parts = full.split(":");
         if (parts.length != 2) {
             throw new IllegalArgumentException("Invalid resource location format: " + full);
         }
         texture = new Resource.Location(parts[0], parts[1]);
+        this.data = data.get();
+        type.create(this);
     }
 
-    public void draw(GameScreen screen) {
-        type.draw(screen, this);
+    public JSONObject data() {
+        return data;
+    }
+
+    public Resource.Location texture() {
+        return texture;
+    }
+
+    public UIType type() {
+        return type;
     }
 }

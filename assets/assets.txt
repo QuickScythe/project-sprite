@@ -16,6 +16,7 @@ resources/entity_data/test/hurt.json
 resources/entity_data/test/step.json
 resources/input/keyboard.json
 resources/input/pathfinder.json
+resources/items/test.json
 resources/lang/en_ps.json
 resources/lang/en_us.json
 resources/magic/element/earth.json
@@ -28,11 +29,15 @@ resources/magic/spell/wind.json
 resources/models/player.json
 resources/models/test.json
 resources/pack.json
+resources/textures/arrow.png
 resources/textures/inventory/furnace.png
+resources/textures/inventory/menu.png
+resources/textures/inventory/player.png
 resources/textures/missing.png
 resources/textures/player.png
 resources/textures/test.png
 resources/ui/furnace.json
+resources/ui/main_menu.json
 resources/ui/player/inventory.json
 ui/font-list.fnt
 ui/font-subtitle.fnt

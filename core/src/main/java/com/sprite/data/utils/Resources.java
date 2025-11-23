@@ -4,15 +4,16 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.sprite.data.registries.Registries;
 import com.sprite.data.registries.Registry;
-import com.sprite.render.ui.UIDefinition;
+import com.sprite.resource.Resource;
 import com.sprite.resource.ResourceMeta;
 import com.sprite.resource.animations.Animation;
-import com.sprite.resource.Resource;
 import com.sprite.resource.controllers.Controller;
 import com.sprite.resource.entities.EntityType;
 import com.sprite.resource.input.Input;
+import com.sprite.resource.items.ItemType;
 import com.sprite.resource.models.Model;
 import com.sprite.resource.texture.GameSprite;
+import com.sprite.resource.ui.UIDefinition;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -30,29 +31,70 @@ import static com.sprite.resource.Resource.Type.DATA;
  */
 public class Resources {
 
-    /** Global registry of all discovered resources (json and textures). */
+    /**
+     * Global registry of all discovered resources (json and textures).
+     */
     public final Registry<Resource> RESOURCE_REGISTRY = Registries.register("resources", () -> null);
-    /** Registry access wrapper for models. */
+    /**
+     * Registry access wrapper for models.
+     */
     public final Resource.RegistryAccess<Model> MODELS;
-    /** Registry access wrapper for animations. */
+    /**
+     * Registry access wrapper for animations.
+     */
     public final Resource.RegistryAccess<Animation> ANIMATIONS;
-    /** Registry access wrapper for textures/sprites. */
+    /**
+     * Registry access wrapper for textures/sprites.
+     */
     public final Resource.RegistryAccess<GameSprite> TEXTURES;
-    /** Registry access wrapper for entity types. */
+    /**
+     * Registry access wrapper for entity types.
+     */
     public final Resource.RegistryAccess<EntityType> ENTITIES;
-    /** Registry access wrapper for inputs. */
+    /**
+     * Registry access wrapper for inputs.
+     */
     public final Resource.RegistryAccess<Input> INPUTS;
-    /** Registry access wrapper for entity controllers. */
+    /**
+     * Registry access wrapper for entity controllers.
+     */
     public final Resource.RegistryAccess<Controller> CONTROLLERS;
-    /** Registry access wrapper for UIs. */
+    /**
+     * Registry access wrapper for UIs.
+     */
     public final Resource.RegistryAccess<UIDefinition> USER_INTERFACES;
+    /**
+     * Registry access wrapper for Items.
+     */
+    public final Resource.RegistryAccess<ItemType> ITEMS;
 
     /**
      * Creates a Resources manager, scanning both internal (classpath) and external (local) assets
      * under the provided root folder.
+     *
      * @param rootFolder the root assets folder (e.g., "resources")
      */
     public Resources(String rootFolder) {
+        ITEMS = new Resource.RegistryAccess<>() {
+            @Override
+            public String key() {
+                return "items";
+            }
+
+            @Override
+            public ItemType load(String location) {
+                if (registry.get(location).isPresent()) {
+                    Gdx.app.debug("Resource", "UI already loaded: " + location);
+                    return registry.get(location).get();
+                }
+                Gdx.app.log("Resource", "Loading UI: " + location);
+                Resource resource = Utils.resources().get(location).orElseThrow();
+                ItemType itemType = new ItemType(resource);
+                registry.register(location, itemType);
+                return itemType;
+            }
+
+        };
         USER_INTERFACES = new Resource.RegistryAccess<>() {
             @Override
             public String key() {
@@ -62,9 +104,9 @@ public class Resources {
             @Override
             public UIDefinition load(String location) {
                 if (registry.get(location).isPresent()) {
-                Gdx.app.debug("Resource", "UI already loaded: " + location);
-                return registry.get(location).get();
-            }
+                    Gdx.app.debug("Resource", "UI already loaded: " + location);
+                    return registry.get(location).get();
+                }
                 Gdx.app.log("Resource", "Loading UI: " + location);
                 Resource resource = Utils.resources().get(location).orElseThrow();
                 UIDefinition uidef = new UIDefinition(resource);
@@ -164,13 +206,13 @@ public class Resources {
             String originalPath = path;
             path = path.substring((rootFolder + "/").length()).trim();
             String namespace = path.contains("/") ? path.split("/")[0] : "internal";
-            path = path.contains("/") ? path.substring(namespace.length()+1).trim() : path;
+            path = path.contains("/") ? path.substring(namespace.length() + 1).trim() : path;
             String ext = handle.extension();
             path = path.replace("." + ext, "");
             Gdx.app.log("Resource", "Registering internal resource: " + namespace + ":" + path);
 
             Resource.Location location = new Resource.Location(namespace, path);
-            Resource resource = new Resource(location, Gdx.files.classpath(originalPath),  true);
+            Resource resource = new Resource(location, Gdx.files.classpath(originalPath), true);
             RESOURCE_REGISTRY.register(location.toString(), resource);
         }
     }
@@ -196,7 +238,8 @@ public class Resources {
 
     /**
      * Utility to build a typed registry for a specific resource domain.
-     * @param key registry key (e.g., "models")
+     *
+     * @param key  registry key (e.g., "models")
      * @param load function that loads and registers an object of type T from a location
      */
     private <T> Resource.RegistryAccess<T> registerRegistry(String key, BiFunction<String, Registry<T>, T> load) {
@@ -227,13 +270,13 @@ public class Resources {
 
             Resource.Location location = new Resource.Location(namespace, newPath);
             Resource resource = new Resource(location, file, false);
-            if(RESOURCE_REGISTRY.has(location.toString())){
+            if (RESOURCE_REGISTRY.has(location.toString())) {
                 Resource existing = RESOURCE_REGISTRY.get(location.toString()).orElseThrow();
-                if(existing.type().equals(DATA)){
+                if (existing.type().equals(DATA)) {
                     ResourceMeta.Json existingMeta = (ResourceMeta.Json) existing.data.data();
                     JSONObject existingJson = existingMeta.get();
                     JSONObject newJson = ((ResourceMeta.Json) resource.data.data()).get();
-                    for(String key : newJson.keySet()){
+                    for (String key : newJson.keySet()) {
                         existingJson.put(key, newJson.get(key));
                     }
                     Gdx.app.log("Resource", "Merged resource data for: " + location);
@@ -249,7 +292,26 @@ public class Resources {
     }
 
     /**
+     * Disposes loaded resources and clears registries.
+     */
+    public void dispose() {
+        try {
+            // Dispose textures
+            for (GameSprite sprite : TEXTURES.all()) {
+                try {
+                    sprite.dispose();
+                } catch (Throwable ignored) {
+                }
+            }
+        } finally {
+            // Clear all registries to release references
+            Registries.reset();
+        }
+    }
+
+    /**
      * Returns a list of resources that belong to the provided namespace.
+     *
      * @param namespace the namespace id
      * @return list of resources within the namespace
      */
@@ -265,6 +327,7 @@ public class Resources {
 
     /**
      * Gets a resource by its full logical location (namespace:path).
+     *
      * @param resourceLocation location string
      * @return optional resource
      */

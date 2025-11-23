@@ -1,0 +1,21 @@
+{
+  "type": "dialog",
+  "texture": "textures:inventory/menu",
+  "dialog": {
+    "rows": 8,
+    "columns": 16,
+    "items": {
+      "play_button": {
+        "type": "button",
+        "position": [
+          6,
+          6
+        ],
+        "scale": [4,1],
+        "button": {
+          "title": "ui.button.play"
+        }
+      }
+    }
+  }
+}

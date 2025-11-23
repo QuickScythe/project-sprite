@@ -3,6 +3,7 @@ package com.sprite.lwjgl3;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowAdapter;
 import com.sprite.Main;
 
 import java.util.HashMap;
@@ -14,8 +15,8 @@ public class Launcher {
     public static Map<String, String> LAUNCH_ARGS = new HashMap<>();
 
     public static void main(String[] args) {
-        LAUNCH_ARGS.put("width", "640");
-        LAUNCH_ARGS.put("height", "480");
+        LAUNCH_ARGS.put("width", "960"); //540
+        LAUNCH_ARGS.put("height", "540");
         LAUNCH_ARGS.put("title", "project-sprite");
         LAUNCH_ARGS.put("vSync", "true");
         LAUNCH_ARGS.put("backgroundFPS", "0");
