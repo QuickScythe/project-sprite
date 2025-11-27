@@ -4,5 +4,7 @@
   "game.title": "Project Sprite",
   "ui.button.play": "Play",
   "ui.button.options": "Options",
-  "ui.button.exit": "Exit"
+  "ui.button.quit": "Exit",
+  "ui.button.en": "English",
+  "ui.button.ps": "Pirate"
 }

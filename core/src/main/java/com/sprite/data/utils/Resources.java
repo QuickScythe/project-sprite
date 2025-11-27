@@ -13,6 +13,7 @@ import com.sprite.resource.input.Input;
 import com.sprite.resource.items.ItemType;
 import com.sprite.resource.models.Model;
 import com.sprite.resource.texture.GameSprite;
+import com.sprite.resource.ui.UIAction;
 import com.sprite.resource.ui.UIDefinition;
 import org.json.JSONObject;
 
@@ -67,6 +68,10 @@ public class Resources {
      * Registry access wrapper for Items.
      */
     public final Resource.RegistryAccess<ItemType> ITEMS;
+    /**
+     * Registry access wrapper for UI Actions.
+     */
+    public final Resource.RegistryAccess<UIAction> ACTIONS;
 
     /**
      * Creates a Resources manager, scanning both internal (classpath) and external (local) assets
@@ -92,6 +97,26 @@ public class Resources {
                 ItemType itemType = new ItemType(resource);
                 registry.register(location, itemType);
                 return itemType;
+            }
+
+        };
+        ACTIONS = new Resource.RegistryAccess<>() {
+            @Override
+            public String key() {
+                return "actions";
+            }
+
+            @Override
+            public UIAction load(String location) {
+                if (registry.get(location).isPresent()) {
+                    Gdx.app.debug("Resource", "UI already loaded: " + location);
+                    return registry.get(location).get();
+                }
+                Gdx.app.log("Resource", "Loading UI Action: " + location);
+                Resource resource = Utils.resources().get(location).orElseThrow();
+                UIAction actionDef = new UIAction(resource);
+                registry.register(location, actionDef);
+                return actionDef;
             }
 
         };

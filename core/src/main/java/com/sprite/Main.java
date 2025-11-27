@@ -61,11 +61,12 @@ public class Main extends Game {
     public void create() {
         for (Map.Entry<String, String> entry : LAUNCH_ARGS.entrySet())
             Gdx.app.log("Launcher", "Argument: " + entry.getKey() + " = " + entry.getValue());
-        Utils.initialize();
+        Utils.initialize(this);
 
 
 //        Texts.lang(Texts.Lang.EN_PS.tag);
         if (!LAUNCH_ARGS.containsKey("debugTool")){
+            Gdx.app.log("Launcher", "Launching game...");
             setScreen(new MenuScreen());
             return;
         }
@@ -83,6 +84,7 @@ public class Main extends Game {
             case "entityEditor":
                 setScreen(EntityEditor.screen());
                 break;
+            case "uiEditor":
             case "inventoryEditor":
                 setScreen(UIEditor.screen());
                 break;

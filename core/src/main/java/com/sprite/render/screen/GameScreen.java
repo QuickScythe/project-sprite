@@ -10,6 +10,11 @@ import com.sprite.input.InputSystem;
 import com.sprite.render.RenderPipeline;
 import com.sprite.render.camera.GameCamera;
 import com.sprite.render.ui.UI;
+import com.sprite.render.ui.inventory.Dialog;
+import com.sprite.render.ui.inventory.Inventory;
+import com.sprite.resource.ui.DialogUI;
+import com.sprite.resource.ui.InventoryUI;
+import com.sprite.resource.ui.UIDefinition;
 import com.sprite.resource.ui.UIType;
 
 import java.util.HashMap;
@@ -35,38 +40,10 @@ public abstract class GameScreen implements Screen {
         font = new BitmapFont();
         // Increase default UI font scale for better legibility on high resolutions
         font.getData().setScale(2f);
-        renderPipeline = new RenderPipeline() {
-
-            @Override
-            public void background() {
-
-            }
-
-            @Override
-            public void backgroundShaders() {
-
-            }
-
-            @Override
-            public void foreground() {
-
-            }
-
-            @Override
-            public void foregroundShader() {
-
-            }
-
-            @Override
-            public void ui() {
-
-            }
-
-            @Override
-            public void uiShader() {
-
-            }
-        };
+        renderPipeline = new RenderPipeline();
+        renderPipeline.ui((screen, delta) -> {
+            if (uiManager.isOpen()) ui().draw();
+        });
 
         camera.setToOrtho(false, 1920, 1080);
         camera.update();
@@ -113,16 +90,21 @@ public abstract class GameScreen implements Screen {
         InputSystem.i().update(delta);
 
         ScreenUtils.clear(color);
-        renderPipeline.background();
-        renderPipeline.backgroundShaders();
-        renderPipeline.foreground();
-        renderPipeline.foregroundShader();
-        renderPipeline.ui();
-        renderPipeline.uiShader();
+        camera.update();
+        sprite().setProjectionMatrix(camera.combined);
+        sprite().begin();
+        renderPipeline.background().render(this, delta);
+        renderPipeline.foreground().render(this, delta);
+        renderPipeline.ui().render(this, delta);
+        sprite().end();
 
-        ui().draw();
+
 
 //        ui().actAndDraw(delta);
+    }
+
+    public RenderPipeline pipeline() {
+        return renderPipeline;
     }
 
     public UIManager ui() {
@@ -130,6 +112,18 @@ public abstract class GameScreen implements Screen {
     }
 
     public class UIManager {
+
+        private boolean open = false;
+
+        public UI<? extends UIType> build(UIDefinition uiDefinition) {
+            if (uiDefinition.type() instanceof InventoryUI type) {
+                return new Inventory(type);
+            }
+            if (uiDefinition.type() instanceof DialogUI type) {
+                return new Dialog(type);
+            }
+            throw new IllegalStateException("Unsupported UI type: " + uiDefinition.type().getClass().getSimpleName() + "");
+        }
 
         public void draw() {
             for (int i = 1; i <= uis.size(); i++) {
@@ -139,12 +133,9 @@ public abstract class GameScreen implements Screen {
 
         public void addFirst(UI<? extends UIType> ui) {
             final int firstSize = uis.size();
-            System.out.println("Adding UI at index " + firstSize);
             for (int i = firstSize; i > 0; i--) {
-                System.out.println("Moving UI at index " + i + " to index " + (i + 1));
                 uis.put(i + 1, uis.get(i));
             }
-            System.out.println("Adding UI at index 1");
             uis.put(1, ui);
         }
 
@@ -163,5 +154,19 @@ public abstract class GameScreen implements Screen {
         public int size() {
             return uis.size();
         }
+
+        public boolean isOpen() {
+            return open;
+        }
+
+        public void open() {
+            open = true;
+        }
+
+        public void close() {
+            open = false;
+        }
+
+
     }
 }

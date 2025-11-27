@@ -1,12 +1,46 @@
 package com.sprite.render;
 
-public interface RenderPipeline {
+import com.sprite.render.screen.GameScreen;
 
-    public abstract void background();
-    public abstract void backgroundShaders();
-    public abstract void foreground();
-    public abstract void foregroundShader();
-    public abstract void ui();
-    public abstract void uiShader();
+public class RenderPipeline {
+
+    private RenderPhase background = (screen, delta) -> {
+    };
+    private RenderPhase foreground = (screen, delta) -> {
+    };
+    private RenderPhase ui = (screen, delta) -> {
+    };
+
+    public RenderPhase background() {
+        return background;
+    }
+
+    public RenderPhase foreground() {
+        return foreground;
+    }
+
+    public RenderPhase ui() {
+        return ui;
+    }
+
+    public void background(RenderPhase background) {
+        this.background = background;
+    }
+
+    public void foreground(RenderPhase foreground) {
+        this.foreground = foreground;
+    }
+
+    public void ui(RenderPhase ui) {
+        this.ui = ui;
+    }
+
+
+    @FunctionalInterface
+    public interface RenderPhase {
+
+        void render(GameScreen screen, float delta);
+
+    }
 
 }

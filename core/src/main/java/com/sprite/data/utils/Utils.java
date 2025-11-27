@@ -1,10 +1,12 @@
 package com.sprite.data.utils;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.math.Vector3;
 import com.sprite.resource.magic.elements.Elements;
 import com.sprite.resource.magic.spells.Spells;
+import org.json.JSONObject;
 
 /**
  * Utility bootstrap class for initializing global systems and providing accessors.
@@ -15,12 +17,14 @@ public class Utils {
     private static Resources resourceManager;
     private static Preferences settings;
     private static boolean shutdown = false;
+    private static Game game;
 
     /**
      * Initializes core subsystems: resource registry, text localization, elements and spells.
      * Logs a message when initialization completes.
      */
-    public static void initialize() {
+    public static void initialize(Game game) {
+        Utils.game = game;
         resourceManager = new Resources("resources");
         Texts.init();
         settings = Gdx.app.getPreferences("player_settings");
@@ -30,6 +34,10 @@ public class Utils {
         Spells.initialize();
 
         Gdx.app.log("Initialization", "Resources Initialized. Game ready to launch");
+    }
+
+    public static Game game(){
+        return game;
     }
 
     public static Preferences settings(){
@@ -63,4 +71,6 @@ public class Utils {
     public static int distance(Vector3 position, Vector3 position1) {
         return (int) Math.sqrt(Math.pow(position.x - position1.x, 2) + Math.pow(position.y - position1.y, 2));
     }
+
+
 }

@@ -7,6 +7,7 @@ import com.sprite.data.utils.Utils;
 import com.sprite.render.screen.GameScreen;
 import com.sprite.resource.ui.dialog.Button;
 import com.sprite.resource.ui.dialog.DialogElement;
+import com.sprite.resource.ui.dialog.Label;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -35,21 +36,44 @@ public class DialogUI extends UIType {
             JSONArray positionArray = itemData.getJSONArray("position");
             JSONArray scaleArray = itemData.getJSONArray("scale");
             if (!itemData.has("type")) throw new IllegalArgumentException("Dialog item (" + key + ") must have type");
+            if (itemData.getString("type").equalsIgnoreCase("label")) {
+                JSONObject labelData = itemData.getJSONObject("label");
+                Label label = new Label(key,
+                    labelData.getString("title"),
+                    new Vector2(positionArray.getInt(0),
+                        positionArray.getInt(1)),
+                    new Vector2(scaleArray.getInt(0),
+                        scaleArray.getInt(1)));
+                elements.register(key, label);
+            }
             if (itemData.getString("type").equalsIgnoreCase("button")) {
                 JSONObject buttonData = itemData.getJSONObject("button");
-                Button button = new Button(key, buttonData.getString("title"), new Vector2(positionArray.getInt(0), positionArray.getInt(1)), new Vector2(scaleArray.getInt(0), scaleArray.getInt(1)));
+                if(!buttonData.has("action")) throw new IllegalArgumentException("Dialog item (" + key + ") must have action");
+                UIAction action;
+                if(buttonData.get("action") instanceof JSONObject json){
+                    action = new UIAction(json);
+                } else {
+                    action = Utils.resources().ACTIONS.load(buttonData.getString("action"));
+                }
+                Button button = new Button(key,
+                    buttonData.getString("title"),
+                    new Vector2(positionArray.getInt(0),
+                        positionArray.getInt(1)),
+                    new Vector2(scaleArray.getInt(0),
+                        scaleArray.getInt(1)),
+                    action);
                 elements.register(key, button);
             }
         }
     }
 
-    public Registry<DialogElement> buttons() {
+    public Registry<DialogElement> elements() {
         return elements;
     }
 
     @Override
     public void draw(GameScreen screen) {
-        screen.sprite().draw(texture.sprite(), (screen.camera().viewportWidth / 2) - (textureWidth / 2), (screen.camera().viewportHeight / 2) - (textureHeight / 2), textureWidth, textureHeight);
+        screen.sprite().draw(texture.sprite(), (screen.camera().position.x - screen.camera().viewportWidth/2)+ (screen.camera().viewportWidth / 2) - (textureWidth / 2), (screen.camera().position.y - screen.camera().viewportHeight/2) + (screen.camera().viewportHeight / 2) - (textureHeight / 2), textureWidth, textureHeight);
 //        screen.shape().end();
 //        screen.sprite().begin();
     }

@@ -1,3 +1,5 @@
+resources/actions/play.json
+resources/actions/quit.json
 resources/animations/player/idle.json
 resources/animations/player/jump.json
 resources/animations/player/step.json
@@ -30,12 +32,16 @@ resources/models/player.json
 resources/models/test.json
 resources/pack.json
 resources/textures/arrow.png
+resources/textures/background.png
 resources/textures/inventory/furnace.png
 resources/textures/inventory/menu.png
 resources/textures/inventory/player.png
 resources/textures/missing.png
 resources/textures/player.png
 resources/textures/test.png
+resources/textures/ui/button.png
+resources/textures/ui/button_hover.png
+resources/textures/ui/button_pressed.png
 resources/ui/furnace.json
 resources/ui/main_menu.json
 resources/ui/player/inventory.json

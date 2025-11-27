@@ -82,12 +82,13 @@ public class Entity {
     }
 
     public void render(GameScreen screen) {
-        screen.sprite().setProjectionMatrix(screen.camera().combined);
-        screen.sprite().begin();
         director.render(screen.sprite(), this, position.x, position.y, width, height);
-        screen.sprite().end();
+
         Vector3 prevNode = null;
-        if (path == null) return;
+        if (path == null)
+            return;
+
+        screen.sprite().end();
         screen.shape().setProjectionMatrix(screen.camera().combined);
         screen.shape().begin(ShapeRenderer.ShapeType.Line);
         screen.shape().setColor(Color.RED);
@@ -99,6 +100,7 @@ public class Entity {
             prevNode = node;
         }
         screen.shape().end();
+        screen.sprite().begin();
 
     }
 

@@ -12,63 +12,24 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.sprite.Main;
 import com.sprite.data.TranslatableString;
 import com.sprite.data.utils.Texts;
+import com.sprite.data.utils.Utils;
+import com.sprite.render.ui.UI;
+import com.sprite.resource.texture.GameSprite;
 
 public class MenuScreen extends GameScreen{
 
-    private boolean built;
+
+    GameSprite background;
 
     @Override
     public void create() {
-        Gdx.app.log("UI", "Building Main Menu");
-        buildUI();
-    }
-
-    private void buildUI() {
-//        if (built) return;
-//        Skin skin = ui().skin();
-//        Table root = new Table(skin);
-//        root.setFillParent(true);
-//        root.defaults().pad(8f).width(240).height(48);
-//
-//        Label title = new Label(Texts.get(new TranslatableString("game.title")), skin);
-//        title.setColor(Color.WHITE);
-//        title.setFontScale(1f);
-//
-//        TextButton play = new TextButton(Texts.get(new TranslatableString("ui.button.play")), skin);
-//        TextButton options = new TextButton(Texts.get(new TranslatableString("ui.button.options")), skin);
-//        TextButton exit = new TextButton(Texts.get(new TranslatableString("ui.button.exit")), skin);
-//
-//        play.addListener(new ClickListener(){
-//            @Override public void clicked(InputEvent event, float x, float y) {
-////                Main main = (Main) Gdx.app.getApplicationListener();
-////                main.setScreen(new WorldScreen());
-//                Texts.lang(Texts.Lang.EN_PS, true);
-//                Main main = (Main) Gdx.app.getApplicationListener();
-//                main.setScreen(new MenuScreen());
-//
-//            }
-//        });
-//        options.addListener(new ClickListener(){
-//            @Override public void clicked(InputEvent event, float x, float y) {
-//                // Placeholder: could push an options window here
-//                Texts.lang(Texts.Lang.EN_US, true);
-//                Main main = (Main) Gdx.app.getApplicationListener();
-//                main.setScreen(new MenuScreen());
-//            }
-//        });
-//        exit.addListener(new ClickListener(){
-//            @Override public void clicked(InputEvent event, float x, float y) {
-//                Gdx.app.exit();
-//            }
-//        });
-//
-//        root.add(title).padBottom(24).width(300).height(60).row();
-//        root.add(play).row();
-//        root.add(options).row();
-//        root.add(exit).row();
-//
-//        ui().stage().addActor(root);
-//        built = true;
+        UI<?> menu = ui().build(Utils.resources().USER_INTERFACES.load("ui:main_menu"));
+        background = Utils.resources().TEXTURES.load("textures:background");
+        ui().addFirst(menu);
+        ui().open();
+        pipeline().background((screen, delta) -> {
+            screen.sprite().draw(background.sprite(), 0, 0, camera().viewportWidth, camera().viewportHeight);
+        });
     }
 
 

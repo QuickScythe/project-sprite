@@ -2,18 +2,117 @@
   "type": "dialog",
   "texture": "textures:inventory/menu",
   "dialog": {
-    "rows": 8,
-    "columns": 16,
+    "rows": 16,
+    "columns": 12,
     "items": {
+      "title_label": {
+        "type": "label",
+        "position": [
+          2,
+          12
+        ],
+        "scale": [
+          8,
+          2
+        ],
+        "label": {
+          "title": "game.title"
+        }
+      },
       "play_button": {
         "type": "button",
         "position": [
-          6,
-          6
+          2,
+          9
         ],
-        "scale": [4,1],
+        "scale": [
+          8,
+          2
+        ],
         "button": {
-          "title": "ui.button.play"
+          "title": "ui.button.play",
+          "action": "actions:play"
+        }
+      },
+      "options_button": {
+        "type": "button",
+        "position": [
+          2,
+          7
+        ],
+        "scale": [
+          8,
+          2
+        ],
+        "button": {
+          "title": "ui.button.options",
+          "action": {
+            "method": "log",
+            "arguments": [
+              {
+                "value": "Options Clicked."
+              }
+            ]
+          }
+        }
+      },
+      "english_button": {
+        "type": "button",
+        "position": [
+          2,
+          5
+        ],
+        "scale": [
+          4,
+          2
+        ],
+        "button": {
+          "title": "ui.button.en",
+          "action": {
+            "method": "lang",
+            "arguments": [
+              {
+                "value": "EN_US"
+              }
+            ]
+          }
+        }
+      },
+      "pirate_button": {
+        "type": "button",
+        "position": [
+          6,
+          5
+        ],
+        "scale": [
+          4,
+          2
+        ],
+        "button": {
+          "title": "ui.button.ps",
+          "action": {
+            "method": "lang",
+            "arguments": [
+              {
+                "value": "EN_PS"
+              }
+            ]
+          }
+        }
+      },
+      "quit_button": {
+        "type": "button",
+        "position": [
+          2,
+          3
+        ],
+        "scale": [
+          8,
+          2
+        ],
+        "button": {
+          "title": "ui.button.quit",
+          "action": "actions:quit"
         }
       }
     }

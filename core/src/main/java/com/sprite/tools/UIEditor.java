@@ -30,34 +30,23 @@ public class UIEditor {
 
         @Override
         public void create() {
-            ui().addFirst(buildUI(Utils.resources().USER_INTERFACES.load("ui:main_menu")));
+            ui().addFirst(ui().build(Utils.resources().USER_INTERFACES.load("ui:main_menu")));
         }
 
-        private UI<? extends UIType> buildUI(UIDefinition uiDefinition) {
-            if (uiDefinition.type() instanceof InventoryUI type) {
-                Inventory inventory = new Inventory(type);
-                inventory.put(0, new ItemStack(Utils.resources().ITEMS.load("items:test"), 10));
-                return inventory;
-            }
-            if (uiDefinition.type() instanceof DialogUI type) {
-                Dialog dialogUI = new Dialog(type);
-                return dialogUI;
-            }
-            throw new IllegalStateException("Unsupported UI type: " + uiDefinition.type().getClass().getSimpleName() + "");
-        }
+
 
 
         @Override
         public void render(float delta) {
             if (Gdx.input.isKeyJustPressed(Input.Keys.L)) {
-                ui().addFirst(buildUI(Utils.resources().USER_INTERFACES.load("ui:furnace")));
+                ui().addFirst(ui().build(Utils.resources().USER_INTERFACES.load("ui:furnace")));
             }
             if (Gdx.input.isKeyJustPressed(Input.Keys.K)) {
-                ui().add(buildUI(Utils.resources().USER_INTERFACES.load("ui:furnace")));
+                ui().add(ui().build(Utils.resources().USER_INTERFACES.load("ui:furnace")));
             }
             if (Gdx.input.isKeyJustPressed(Input.Keys.J)) {
                 ui().clear();
-                ui().add(buildUI(Utils.resources().USER_INTERFACES.load("ui:player/inventory")));
+                ui().add(ui().build(Utils.resources().USER_INTERFACES.load("ui:player/inventory")));
 //                buildUI(Utils.resources().USER_INTERFACES.load("ui:main_menu"));
             }
             if(Gdx.input.isKeyJustPressed(Input.Keys.I)){

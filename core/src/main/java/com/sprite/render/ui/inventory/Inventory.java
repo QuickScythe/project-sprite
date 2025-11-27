@@ -48,8 +48,8 @@ public class Inventory extends UI<InventoryUI> {
                 System.out.println("Inventory out of bounds: " + index);
             screen.sprite().draw(
                 itemStack.type().texture().sprite(),
-                pos.x,
-                pos.y,
+                pos.x + screen.camera().position.x,
+                pos.y + screen.camera().position.y,
                 type().size() * type().scale(),
                 type().size() * type().scale());
         }
