@@ -1,5 +1,6 @@
 package com.sprite.resource.ui.dialog;
 
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.math.Vector2;
 import com.sprite.data.TranslatableString;
 import com.sprite.data.utils.Texts;
@@ -14,6 +15,7 @@ public class Button extends DialogElement {
     private final NineSliceSprite down;
     private final NineSliceSprite hover;
     private final UIAction action;
+    private final Label label;
 
     public Button(String name, String translationKey, Vector2 position, Vector2 size, UIAction action) {
         super(name, translationKey, position, size);
@@ -22,6 +24,8 @@ public class Button extends DialogElement {
         this.up = new NineSliceSprite(Utils.resources().TEXTURES.load("textures:ui/button"), 48, 48, 48, 48);
         this.down = new NineSliceSprite(Utils.resources().TEXTURES.load("textures:ui/button_pressed"), 48, 48, 48, 48);
         this.hover = new NineSliceSprite(Utils.resources().TEXTURES.load("textures:ui/button_hover"), 48, 48, 48, 48);
+
+        label = new Label(name, translationKey, position, size);
     }
 
 
@@ -59,5 +63,6 @@ public class Button extends DialogElement {
         if (isJustClicked()) {
             click();
         }
+        label.draw(screen, x, y, width, height);
     }
 }

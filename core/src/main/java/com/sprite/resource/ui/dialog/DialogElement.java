@@ -4,11 +4,14 @@ import com.badlogic.gdx.math.Vector2;
 import com.sprite.data.TranslatableString;
 import com.sprite.data.utils.Texts;
 import com.sprite.render.screen.GameScreen;
+import com.sprite.render.ui.UI;
+import com.sprite.resource.ui.DialogUI;
+import com.sprite.resource.ui.UIType;
 
 /**
  * Base UI element used by DialogUI. Holds grid position/size and transient interaction state.
  */
-public class DialogElement {
+public abstract class DialogElement {
 
     private final TranslatableString title;
     private final String name;
@@ -54,7 +57,9 @@ public class DialogElement {
         return Texts.get(title);
     }
 
-    public void draw(GameScreen screen, float x, float y, float width, float height) {
+    public abstract void draw(GameScreen screen, float x, float y, float width, float height);
 
+    public void debug(GameScreen screen, float x, float y, float w, float h, UIType type) {
+        screen.shape().rect(x, y, w, h);
     }
 }

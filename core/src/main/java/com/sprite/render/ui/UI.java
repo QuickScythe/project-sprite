@@ -16,4 +16,6 @@ public abstract class UI<T extends UIType> {
     }
 
     public abstract void draw(GameScreen screen);
+
+    public abstract void debug(GameScreen screen);
 }

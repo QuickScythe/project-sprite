@@ -3,6 +3,7 @@ package com.sprite.tools;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.sprite.data.utils.Utils;
 import com.sprite.game.ItemStack;
@@ -60,13 +61,17 @@ public class UIEditor {
             sprite().setProjectionMatrix(camera().combined);
             sprite().begin();
             ui().draw();
+            screen.sprite().end();
+            screen.shape().setProjectionMatrix(screen.camera().combined);
+            screen.shape().begin(ShapeRenderer.ShapeType.Line);
+            ui().debug();
+            screen.shape().end();
 //            float x = 0;
 //            for(EntityType type : Utils.resources().ENTITIES.all()){
 //
 //            sprite().draw(type.model.animations[1].frame(type.model), (camera().viewportWidth/2)-(type.width/2), (camera().viewportHeight/2)-(type.width/2), type.width, type.height);
 
 
-            sprite().end();
 
 //
 //

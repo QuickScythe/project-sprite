@@ -8,6 +8,7 @@ import com.sprite.render.screen.GameScreen;
 import com.sprite.resource.ui.dialog.Button;
 import com.sprite.resource.ui.dialog.DialogElement;
 import com.sprite.resource.ui.dialog.Label;
+import com.sprite.resource.ui.dialog.Slider;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -45,6 +46,24 @@ public class DialogUI extends UIType {
                     new Vector2(scaleArray.getInt(0),
                         scaleArray.getInt(1)));
                 elements.register(key, label);
+            }
+            if (itemData.getString("type").equalsIgnoreCase("slider")) {
+                JSONObject sliderData = itemData.getJSONObject("slider");
+                Slider slider = new Slider(
+                    key,
+                    sliderData.optString("label", "ui.slider.value"),
+                    sliderData.optInt("min", 0),
+                    sliderData.optInt("max", 10),
+                    sliderData.optInt("value", 5),
+                    sliderData.optInt("step", 1),
+                    sliderData.has("label"),
+                    new Vector2(positionArray.getInt(0),
+                        positionArray.getInt(1)),
+                    new Vector2(scaleArray.getInt(0),
+                        scaleArray.getInt(1)));
+                elements.register(key, slider);
+
+
             }
             if (itemData.getString("type").equalsIgnoreCase("button")) {
                 JSONObject buttonData = itemData.getJSONObject("button");

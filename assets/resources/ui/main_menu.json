@@ -114,6 +114,24 @@
           "title": "ui.button.quit",
           "action": "actions:quit"
         }
+      },
+      "slider_test": {
+        "type": "slider",
+        "position": [
+          2,
+          1
+        ],
+        "scale": [
+          8,
+          2
+        ],
+        "slider": {
+          "label": "ui.slider.value",
+          "min": 0,
+          "max": 10,
+          "value": 5,
+          "step": 1
+        }
       }
     }
   }

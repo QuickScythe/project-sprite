@@ -130,6 +130,11 @@ public abstract class GameScreen implements Screen {
                 if (uis.get(i) != null) uis.get(i).draw(GameScreen.this);
             }
         }
+        public void debug() {
+            for (int i = 1; i <= uis.size(); i++) {
+                if (uis.get(i) != null) uis.get(i).debug(GameScreen.this);
+            }
+        }
 
         public void addFirst(UI<? extends UIType> ui) {
             final int firstSize = uis.size();
@@ -166,6 +171,7 @@ public abstract class GameScreen implements Screen {
         public void close() {
             open = false;
         }
+
 
 
     }

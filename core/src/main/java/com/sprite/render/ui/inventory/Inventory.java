@@ -55,6 +55,10 @@ public class Inventory extends UI<InventoryUI> {
         }
     }
 
+    @Override
+    public void debug(GameScreen screen) {
+
+    }
 
 
     public void put(int i, ItemStack itemStack) {
