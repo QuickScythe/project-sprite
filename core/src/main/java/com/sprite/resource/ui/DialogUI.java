@@ -44,7 +44,8 @@ public class DialogUI extends UIType {
                     new Vector2(positionArray.getInt(0),
                         positionArray.getInt(1)),
                     new Vector2(scaleArray.getInt(0),
-                        scaleArray.getInt(1)));
+                        scaleArray.getInt(1)),
+                    DialogUI.this);
                 elements.register(key, label);
             }
             if (itemData.getString("type").equalsIgnoreCase("slider")) {
@@ -60,7 +61,8 @@ public class DialogUI extends UIType {
                     new Vector2(positionArray.getInt(0),
                         positionArray.getInt(1)),
                     new Vector2(scaleArray.getInt(0),
-                        scaleArray.getInt(1)));
+                        scaleArray.getInt(1)),
+                    DialogUI.this);
                 elements.register(key, slider);
 
 
@@ -80,7 +82,8 @@ public class DialogUI extends UIType {
                         positionArray.getInt(1)),
                     new Vector2(scaleArray.getInt(0),
                         scaleArray.getInt(1)),
-                    action);
+                    action,
+                    DialogUI.this);
                 elements.register(key, button);
             }
         }
@@ -92,7 +95,8 @@ public class DialogUI extends UIType {
 
     @Override
     public void draw(GameScreen screen) {
-        screen.sprite().draw(texture.sprite(), (screen.camera().position.x - screen.camera().viewportWidth/2)+ (screen.camera().viewportWidth / 2) - (textureWidth / 2), (screen.camera().position.y - screen.camera().viewportHeight/2) + (screen.camera().viewportHeight / 2) - (textureHeight / 2), textureWidth, textureHeight);
+        Vector2 topLeft = uiTopLeft(screen);
+        screen.sprite().draw(texture.sprite(), topLeft.x, topLeft.y, textureWidth, textureHeight);
 //        screen.shape().end();
 //        screen.sprite().begin();
     }

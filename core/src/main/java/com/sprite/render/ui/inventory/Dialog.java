@@ -21,8 +21,7 @@ public class Dialog extends UI<DialogUI> {
     @Override
     public void debug(GameScreen screen) {
         screen.shape().setColor(Color.YELLOW);
-        float camX = (screen.camera().position.x - screen.camera().viewportWidth / 2);
-        float camY = (screen.camera().position.y - screen.camera().viewportHeight / 2);
+        Vector2 cam = type().cameraOrigin(screen);
         for (int x = 0; x < type().columns(); x++) {
             for (int y = 0; y < type().rows(); y++) {
                 int index = y * type().columns() + x;
@@ -40,26 +39,23 @@ public class Dialog extends UI<DialogUI> {
 
             // Hit-test using world-space cursor (UI is drawn in world space relative to camera)
             Vector3 world = InputSystem.i().worldCursor(screen.camera());
-            float worldPosX = camX + pos.x;
-            float worldPosY = camY + pos.y;
+            float worldPosX = cam.x + pos.x;
+            float worldPosY = cam.y + pos.y;
             boolean hovered = world.x >= worldPosX && world.x <= worldPosX + w && world.y >= worldPosY && world.y <= worldPosY + h;
             boolean pressed = hovered && InputSystem.i().isActionPressed(InputAction.Primary);
             boolean justClicked = hovered && InputSystem.i().isActionJustPressed(InputAction.Primary);
             element.setInteractionState(hovered, pressed, justClicked);
             screen.shape().setColor(Color.RED);
-            element.debug(screen, camX + pos.x, camY + pos.y, w, h, type());
+            element.debug(screen, cam.x + pos.x, cam.y + pos.y, w, h);
         }
     }
-
     @Override
     public void draw(GameScreen screen) {
         screen.shape().setColor(Color.YELLOW);
         type().draw(screen);
         VirtualCursor cursor = InputSystem.i().cursor();
         cursor.draw(screen);
-        float camX = (screen.camera().position.x - screen.camera().viewportWidth / 2);
-        float camY = (screen.camera().position.y - screen.camera().viewportHeight / 2);
-
+        Vector2 cam = type().cameraOrigin(screen);
 
         for (DialogElement element : type().elements().values()) {
             // Compute element world-space rect
@@ -69,16 +65,14 @@ public class Dialog extends UI<DialogUI> {
 
             // Hit-test using world-space cursor (UI is drawn in world space relative to camera)
             Vector3 world = InputSystem.i().worldCursor(screen.camera());
-            float worldPosX = camX + pos.x;
-            float worldPosY = camY + pos.y;
+            float worldPosX = cam.x + pos.x;
+            float worldPosY = cam.y + pos.y;
             boolean hovered = world.x >= worldPosX && world.x <= worldPosX + w && world.y >= worldPosY && world.y <= worldPosY + h;
             boolean pressed = hovered && InputSystem.i().isActionPressed(InputAction.Primary);
             boolean justClicked = hovered && InputSystem.i().isActionJustPressed(InputAction.Primary);
             element.setInteractionState(hovered, pressed, justClicked);
-            element.draw(screen, camX + pos.x, camY + pos.y, w, h);
+            element.draw(screen, cam.x + pos.x, cam.y + pos.y, w, h);
             // Debug draw background with hover/press tint
-
         }
-
     }
 }

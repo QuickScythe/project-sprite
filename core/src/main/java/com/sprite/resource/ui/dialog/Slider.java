@@ -11,7 +11,7 @@ import com.sprite.input.InputSystem;
 import com.sprite.render.screen.GameScreen;
 import com.sprite.resource.texture.GameSprite;
 import com.sprite.resource.texture.NineSliceSprite;
-import com.sprite.resource.ui.UIType;
+import com.sprite.resource.ui.DialogUI;
 
 public class Slider extends DialogElement {
 
@@ -26,14 +26,14 @@ public class Slider extends DialogElement {
     private float value;
 
 
-    public Slider(String name, String translationKey, float minRange, float maxRange, float defaultValue, float step, boolean label, Vector2 position, Vector2 size) {
-        super(name, translationKey, position, size);
+    public Slider(String name, String translationKey, float minRange, float maxRange, float defaultValue, float step, boolean label, Vector2 position, Vector2 size, DialogUI dialog) {
+        super(name, translationKey, position, size, dialog);
         this.minRange = minRange;
         this.maxRange = maxRange;
         this.step = step;
         this.slider = new NineSliceSprite(Utils.resources().TEXTURES.load("textures:ui/slider"), 48, 48, 48, 48);
-        this.knob = new Knob(name, translationKey, position, size);
-        this.label = label ? new Label(name, translationKey, position, size) : null;
+        this.knob = new Knob(name, translationKey, position, size, dialog);
+        this.label = label ? new Label(name, translationKey, position, size, dialog) : null;
         this.value = defaultValue;
 
     }
@@ -48,9 +48,9 @@ public class Slider extends DialogElement {
     }
 
     @Override
-    public void debug(GameScreen screen, float x, float y, float w, float h, UIType type) {
-        super.debug(screen, x, y, w, h, type);
-        knob.debug(screen, x, y, w, h, type);
+    public void debug(GameScreen screen, float x, float y, float w, float h) {
+        super.debug(screen, x, y, w, h);
+        knob.debug(screen, x, y, w, h);
     }
 
     private class Knob extends DialogElement {
@@ -58,8 +58,8 @@ public class Slider extends DialogElement {
         private final GameSprite sprite;
         private boolean dragging = false;
 
-        public Knob(String name, String translationKey, Vector2 position, Vector2 size) {
-            super(name, translationKey, new Vector2((int)(position.x + (size.x*(value/maxRange))), position.y), new Vector2(0.5f, size.y));
+        public Knob(String name, String translationKey, Vector2 position, Vector2 size, DialogUI dialog) {
+            super(name, translationKey, new Vector2((int) (position.x + (size.x * (value / maxRange))), position.y), new Vector2(0.5f, size.y), dialog);
             this.sprite = Utils.resources().TEXTURES.load("textures:ui/knob");
         }
 
@@ -73,20 +73,26 @@ public class Slider extends DialogElement {
             // Compute percentage of the slider (0..1)
             float range = Math.max(0.0001f, (maxRange - minRange));
             float percent = (value - minRange) / range;
-            if (percent < 0f) percent = 0f; else if (percent > 1f) percent = 1f;
+            if (percent < 0f) percent = 0f;
+            else if (percent > 1f) percent = 1f;
 
             // Draw knob at world-space position based on percent
-            float knobWidth = 32f;
-            float knobX = x - (knobWidth/2f) + (width * percent);
+
+            float knobWidth = size().x * dialog().gridWidthSize();
+
+//            float worldPosX = cam.x + (pos.x - w/2 + (w1*percent)) + (dialog().gridWidthSize());
+
+            float knobX = x - (knobWidth / 2f) + ((width - (dialog().gridWidthSize() * 2)) * percent) + (dialog().gridWidthSize());
             screen.sprite().draw(texture(), knobX, y, knobWidth, height);
 
             // World-space cursor for hit-testing (UI is projected into world)
             Vector3 world = InputSystem.i().worldCursor(screen.camera());
 
-            // Track bounds (full slider bar)
-            float trackX = x;
+            // Track bounds (padded to match visual track: full width - gridWidth*2, centered)
+            float pad = dialog().gridWidthSize();
+            float trackX = x + pad;
             float trackY = y;
-            float trackW = width;
+            float trackW = width - (pad * 2f);
             float trackH = height;
 
             // Knob bounds
@@ -111,7 +117,8 @@ public class Slider extends DialogElement {
             // While dragging, update value according to cursor position along the track
             if (dragging && pressed) {
                 float newPercent = (world.x - trackX) / trackW;
-                if (newPercent < 0f) newPercent = 0f; else if (newPercent > 1f) newPercent = 1f;
+                if (newPercent < 0f) newPercent = 0f;
+                else if (newPercent > 1f) newPercent = 1f;
                 float rawValue = minRange + newPercent * (maxRange - minRange);
                 // Snap to step
                 float snapped;
@@ -133,26 +140,26 @@ public class Slider extends DialogElement {
         }
 
         @Override
-        public void debug(GameScreen screen, float x, float y, float w1, float h1, UIType type) {
+        public void debug(GameScreen screen, float x, float y, float w1, float h1) {
             screen.shape().setColor(Color.GREEN);
-            float camX = (screen.camera().position.x - screen.camera().viewportWidth / 2);
-            float camY = (screen.camera().position.y - screen.camera().viewportHeight / 2);
-            Vector2 pos = type.position(screen, Knob.this.position());
-            float w = (Knob.this.size().x * type.gridWidthSize());
-            float h = (Knob.this.size().y * type.gridHeightSize());
+            Vector2 cam = dialog().cameraOrigin(screen);
+            Vector2 pos = dialog().position(screen, Knob.this.position());
+            float w = (Knob.this.size().x * dialog().gridWidthSize());
+            float h = (Knob.this.size().y * dialog().gridHeightSize());
             float range = Math.max(0.0001f, (maxRange - minRange));
             float percent = (value - minRange) / range;
+            w1 = w1 - (dialog().gridWidthSize() * 2);
 
             // Hit-test using world-space cursor (UI is drawn in world space relative to camera)
             Vector3 world = InputSystem.i().worldCursor(screen.camera());
-            float worldPosX = camX + (pos.x - w/2 + (w1*percent));
-            float worldPosY = camY + pos.y;
+            float worldPosX = cam.x + (pos.x - w / 2 + (w1 * percent)) + (dialog().gridWidthSize());
+            float worldPosY = cam.y + pos.y;
             boolean hovered = world.x >= worldPosX && world.x <= worldPosX + w && world.y >= worldPosY && world.y <= worldPosY + h;
             boolean pressed = hovered && InputSystem.i().isActionPressed(InputAction.Primary);
             boolean justClicked = hovered && InputSystem.i().isActionJustPressed(InputAction.Primary);
             Knob.this.setInteractionState(hovered, pressed, justClicked);
 
-            super.debug(screen, worldPosX, worldPosY, w, h, type);
+            super.debug(screen, worldPosX, worldPosY, w, h);
         }
     }
 }

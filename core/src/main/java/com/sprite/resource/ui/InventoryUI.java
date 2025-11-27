@@ -46,15 +46,14 @@ public class InventoryUI extends UIType {
 
     @Override
     public void draw(GameScreen screen) {
-        float camX = (screen.camera().position.x - screen.camera().viewportWidth/2);
-        float camY = (screen.camera().position.y - screen.camera().viewportHeight/2);
-        screen.sprite().draw(texture.sprite(), camX + (screen.camera().viewportWidth / 2) - (textureWidth / 2), camY + (screen.camera().viewportHeight / 2) - (textureHeight / 2), textureWidth, textureHeight);
+        Vector2 topLeft = uiTopLeft(screen);
+        screen.sprite().draw(texture.sprite(), topLeft.x, topLeft.y, textureWidth, textureHeight);
         screen.sprite().end();
         screen.shape().setProjectionMatrix(screen.camera().combined);
         screen.shape().begin(ShapeRenderer.ShapeType.Filled);
 
-
         // Iterate across visible grid: x in columns (width), y in rows (height)
+        Vector2 cam = cameraOrigin(screen);
         for (int x = 0; x < columns; x++) {
             for (int y = 0; y < rows; y++) {
                 int index = y * columns + x;
@@ -62,8 +61,7 @@ public class InventoryUI extends UIType {
                 if (getHoveredIndex(screen) == index) {
                     screen.shape().setColor(new Color(0.75f, 0.75f, 0.75f, 0.0125f));
                     Vector2 pos = position(screen, index);
-                    screen.shape().rect(camX+pos.x, camY+pos.y, size * scale(), size * scale());
-
+                    screen.shape().rect(cam.x + pos.x, cam.y + pos.y, size * scale(), size * scale());
                 }
             }
         }
@@ -77,10 +75,9 @@ public class InventoryUI extends UIType {
      */
     public int getHoveredIndex(GameScreen screen) {
         float cellSize = size * scale();
-        float camX = (screen.camera().position.x - screen.camera().viewportWidth/2f);
-        float camY = (screen.camera().position.y - screen.camera().viewportHeight/2f);
-        float gridX = camX + (screen.camera().viewportWidth / 2f) - (uiWidth / 2f);
-        float gridY = camY + (screen.camera().viewportHeight / 2f) - (uiHeight / 2f);
+        Vector2 cam = cameraOrigin(screen);
+        float gridX = cam.x + (screen.camera().viewportWidth / 2f) - (uiWidth / 2f);
+        float gridY = cam.y + (screen.camera().viewportHeight / 2f) - (uiHeight / 2f);
 
         Vector3 world = InputSystem.i().worldCursor(screen.camera());
 
@@ -116,10 +113,9 @@ public class InventoryUI extends UIType {
      */
     public boolean isMouseOverUITexture(GameScreen screen) {
         // Compute texture rect centered in the viewport, projected into world space w.r.t camera
-        float camX = (screen.camera().position.x - screen.camera().viewportWidth/2f);
-        float camY = (screen.camera().position.y - screen.camera().viewportHeight/2f);
-        float left = camX + (screen.camera().viewportWidth / 2f) - (textureWidth / 2f);
-        float bottom = camY + (screen.camera().viewportHeight / 2f) - (textureHeight / 2f);
+        Vector2 topLeft = uiTopLeft(screen);
+        float left = topLeft.x;
+        float bottom = topLeft.y;
 
         Vector3 world = InputSystem.i().worldCursor(screen.camera());
 

@@ -17,18 +17,22 @@ public abstract class DialogElement {
     private final String name;
     private final Vector2 position;
     private final Vector2 size;
+    private final DialogUI dialog;
 
     // Transient per-frame interaction state
     private boolean hovered;
     private boolean pressed;
     private boolean justClicked;
 
-    public DialogElement(String name, String translationKey, Vector2 position, Vector2 size) {
+    public DialogElement(String name, String translationKey, Vector2 position, Vector2 size, DialogUI dialog) {
         this.name = name;
         this.position = position;
         this.size = size;
         this.title = new TranslatableString(translationKey);
+        this.dialog = dialog;
     }
+
+    public DialogUI dialog() { return dialog; }
 
     /** Called by rendering/input pass each frame to update interaction flags. */
     public void setInteractionState(boolean hovered, boolean pressed, boolean justClicked) {
@@ -59,7 +63,7 @@ public abstract class DialogElement {
 
     public abstract void draw(GameScreen screen, float x, float y, float width, float height);
 
-    public void debug(GameScreen screen, float x, float y, float w, float h, UIType type) {
+    public void debug(GameScreen screen, float x, float y, float w, float h) {
         screen.shape().rect(x, y, w, h);
     }
 }

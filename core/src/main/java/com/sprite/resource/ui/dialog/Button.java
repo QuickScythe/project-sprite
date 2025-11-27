@@ -7,6 +7,7 @@ import com.sprite.data.utils.Texts;
 import com.sprite.data.utils.Utils;
 import com.sprite.render.screen.GameScreen;
 import com.sprite.resource.texture.NineSliceSprite;
+import com.sprite.resource.ui.DialogUI;
 import com.sprite.resource.ui.UIAction;
 
 public class Button extends DialogElement {
@@ -17,15 +18,15 @@ public class Button extends DialogElement {
     private final UIAction action;
     private final Label label;
 
-    public Button(String name, String translationKey, Vector2 position, Vector2 size, UIAction action) {
-        super(name, translationKey, position, size);
+    public Button(String name, String translationKey, Vector2 position, Vector2 size, UIAction action, DialogUI dialog) {
+        super(name, translationKey, position, size, dialog);
         this.action = action;
 
         this.up = new NineSliceSprite(Utils.resources().TEXTURES.load("textures:ui/button"), 48, 48, 48, 48);
         this.down = new NineSliceSprite(Utils.resources().TEXTURES.load("textures:ui/button_pressed"), 48, 48, 48, 48);
         this.hover = new NineSliceSprite(Utils.resources().TEXTURES.load("textures:ui/button_hover"), 48, 48, 48, 48);
 
-        label = new Label(name, translationKey, position, size);
+        label = new Label(name, translationKey, position, size, dialog);
     }
 
 

@@ -3,12 +3,13 @@ package com.sprite.resource.ui.dialog;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.math.Vector2;
 import com.sprite.render.screen.GameScreen;
+import com.sprite.resource.ui.DialogUI;
 
 public class Label extends DialogElement {
 
 
-    public Label(String name, String translationKey, Vector2 position, Vector2 size) {
-        super(name, translationKey, position, size);
+    public Label(String name, String translationKey, Vector2 position, Vector2 size, DialogUI dialog) {
+        super(name, translationKey, position, size, dialog);
     }
 
     @Override

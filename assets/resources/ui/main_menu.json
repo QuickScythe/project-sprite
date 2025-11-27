@@ -72,7 +72,8 @@
             "method": "lang",
             "arguments": [
               {
-                "value": "EN_US"
+                "value": "EN_US",
+                "flush": false
               }
             ]
           }
