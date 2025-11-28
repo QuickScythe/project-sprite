@@ -15,15 +15,29 @@ public class VirtualCursor {
     private float y; // screen-space Y (pixels)
     private boolean visible = true;
 
-    public float getX() { return x; }
-    public float getY() { return y; }
-    public void set(float x, float y) { this.x = x; this.y = y; }
+    public float getX() {
+        return x;
+    }
 
-    public boolean isVisible() { return visible; }
-    public void setVisible(boolean visible) { this.visible = visible; }
+    public float getY() {
+        return y;
+    }
+
+    public void set(float x, float y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
 
     public boolean hold(ItemStack stack) {
-        if(holding == null){
+        if (holding == null) {
             holding = stack;
             return true;
         }
@@ -43,16 +57,18 @@ public class VirtualCursor {
 
     /**
      * Draws the virtual cursor. SpriteBatch must have already been began.
-     * @param screen    The screen to draw to
+     *
+     * @param screen The screen to draw to
      */
     public void draw(GameScreen screen) {
-        if(holding != null){
+        if (holding != null) {
             Vector3 v = new Vector3(x, y, 0f);
             Vector3 pos = screen.camera().unproject(v);
             int size = 150;
 
 
-            screen.sprite().draw(holding.type().texture().sprite(), pos.x-(size/2f), pos.y-(size/2f), size, size);
+            screen.sprite().draw(holding.type().texture().sprite(), pos.x - (size / 2f), pos.y - (size / 2f), size, size);
+            if (holding.amount() > 1) screen.font().draw(screen.sprite(), holding.amount() + "", pos.x+(size/3f), pos.y-(size/3f));
         }
     }
 }

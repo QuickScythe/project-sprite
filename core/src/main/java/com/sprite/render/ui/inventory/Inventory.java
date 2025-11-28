@@ -59,8 +59,8 @@ public class Inventory extends UI<InventoryUI> {
             if (itemStack.amount() > 1) {
                 screen.font().draw(screen.sprite(),
                     Integer.toString(itemStack.amount()),
-                    pos.x + cam.x + type().size() * type().scale() / 2,
-                    pos.y + cam.y + type().size() * type().scale() / 2
+                    pos.x + cam.x + type().size() * type().scale() / 1.3f,
+                    pos.y + cam.y + type().size() * type().scale() / 4
                 );
             }
         }
