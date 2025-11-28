@@ -1,12 +1,12 @@
 {
   "type": "dialog",
-  "texture": "textures:inventory/menu",
+  "texture": "textures:ui/menu",
   "dialog": {
     "rows": 16,
     "columns": 12,
     "items": {
-      "title_label": {
-        "type": "label",
+      "title_image": {
+        "type": "image",
         "position": [
           2,
           12
@@ -15,8 +15,8 @@
           8,
           2
         ],
-        "label": {
-          "title": "game.title"
+        "image": {
+          "texture": "textures:ui/title"
         }
       },
       "play_button": {
@@ -116,7 +116,7 @@
           "action": "actions:quit"
         }
       },
-      "slider_test": {
+      "volume_slider": {
         "type": "slider",
         "position": [
           2,
@@ -127,10 +127,10 @@
           2
         ],
         "slider": {
-          "label": "ui.slider.value",
+          "label": "ui.volume.slider",
           "min": 0,
-          "max": 10,
-          "value": 5,
+          "max": 100,
+          "value": "${settings:volume|75}",
           "step": 1
         }
       }

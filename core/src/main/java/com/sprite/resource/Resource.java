@@ -6,6 +6,7 @@ import com.sprite.data.registries.Registries;
 import com.sprite.data.registries.Registry;
 
 import java.util.Collection;
+import java.util.Locale;
 
 import static com.sprite.resource.Resource.Type.DATA;
 
@@ -46,18 +47,36 @@ public class Resource {
         this.internal = internal;
         this.file = file;
         switch (type()) {
-            case TEXTURE ->{
-                if(!file.extension().equals("png"))
+            case TEXTURE -> {
+                if (!file.extension().equals("png"))
                     throw new IllegalArgumentException("Texture file must be a PNG imag: " + file.path());
                 this.data = new Data(type(), new ResourceMeta.Texture(file));
             }
-            case DATA ->{
-                if(!file.extension().equals("json"))
+            case DATA -> {
+                if (!file.extension().equals("json"))
                     throw new IllegalArgumentException("JSON file must be a JSON file: " + file.path());
                 this.data = new Data(type(), new ResourceMeta.Json(file));
             }
+            case SOUND -> {
+                if (!file.extension().equals("wav"))
+                    throw new IllegalArgumentException("Sound file must be a WAV: " + file.path());
+                this.data = new Data(type(), new ResourceMeta.Sound(file));
+            }
         }
-        this.data = new Data(type(), type() == DATA ? new ResourceMeta.Json(file) : new ResourceMeta.Texture(file));
+        switch (type()) {
+            case TEXTURE:
+                this.data = new Data(type(), new ResourceMeta.Texture(file));
+                break;
+
+            case DATA:
+                this.data = new Data(type(), new ResourceMeta.Json(file));
+                break;
+
+            case SOUND:
+                this.data = new Data(type(), new ResourceMeta.Sound(file));
+                break;
+
+        }
 
     }
 
@@ -94,7 +113,12 @@ public class Resource {
      * @return DATA for .json files, otherwise TEXTURE
      */
     public Type type() {
-        return file.extension().equalsIgnoreCase("json") ? DATA : Type.TEXTURE;
+        return switch (file.extension().toLowerCase(Locale.ENGLISH)) {
+            case ("json") -> DATA;
+            case ("wav") -> Type.SOUND;
+            case ("mp3") -> Type.MUSIC;
+            default -> Type.TEXTURE;
+        };
     }
 
     /**
@@ -117,7 +141,15 @@ public class Resource {
         /**
          * Texture-based image data.
          */
-        TEXTURE
+        TEXTURE,
+        /**
+         * Sound-based audio data.
+         */
+        SOUND,
+        /**
+         * Music-based audio data.
+         */
+        MUSIC
     }
 
     /**

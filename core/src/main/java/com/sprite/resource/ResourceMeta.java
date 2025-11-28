@@ -1,5 +1,6 @@
 package com.sprite.resource;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import org.json.JSONObject;
 
@@ -14,6 +15,28 @@ public interface ResourceMeta<T> {
      * @return the underlying payload instance
      */
     T get();
+
+    record Music(com.badlogic.gdx.audio.Music music) implements ResourceMeta<com.badlogic.gdx.audio.Music> {
+        public Music(FileHandle file){
+            this(Gdx.audio.newMusic(file));
+        }
+        @Override
+        public com.badlogic.gdx.audio.Music get() {
+            return music;
+        }
+    }
+
+    /** Metadata wrapper for Sound resources. */
+    record Sound(com.badlogic.gdx.audio.Sound sound) implements ResourceMeta<com.badlogic.gdx.audio.Sound> {
+
+        public Sound(FileHandle file){
+            this(Gdx.audio.newSound(file));
+        }
+        @Override
+        public com.badlogic.gdx.audio.Sound get() {
+            return sound;
+        }
+    }
 
     /** Metadata wrapper for JSON resources. */
     record Json(JSONObject json) implements ResourceMeta<JSONObject> {

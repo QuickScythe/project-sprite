@@ -1,6 +1,8 @@
 package com.sprite.data.utils;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.sprite.data.registries.Registries;
 import com.sprite.data.registries.Registry;
@@ -74,12 +76,55 @@ public class Resources {
     public final Resource.RegistryAccess<UIAction> ACTIONS;
 
     /**
+     * Registry access wrapper for music assets.
+     */
+    public final Resource.RegistryAccess<Music> MUSIC;
+
+    /**
+     * Registry access wrapper for sound assets.
+     */
+    public final Resource.RegistryAccess<Sound> SOUNDS;
+
+    /**
      * Creates a Resources manager, scanning both internal (classpath) and external (local) assets
      * under the provided root folder.
      *
      * @param rootFolder the root assets folder (e.g., "resources")
      */
     public Resources(String rootFolder) {
+        MUSIC = new Resource.RegistryAccess<>() {
+            @Override
+            public String key() {
+                return "music";
+            }
+
+            @Override
+            public Music load(String location) {
+                Resource resource = Utils.resources().get(location).orElseThrow();
+                return Gdx.audio.newMusic(resource.file());
+            }
+
+
+        };
+        SOUNDS = new Resource.RegistryAccess<>() {
+            @Override
+            public String key() {
+                return "sounds";
+            }
+            @Override
+            public Sound load(String location) {
+                if (registry.get(location).isPresent()) {
+                    Gdx.app.debug("Resource", "Sound already loaded: " + location);
+                    return registry.get(location).get();
+                }
+                Gdx.app.log("Resource", "Loading sound: " + location);
+                Resource resource = Utils.resources().get(location).orElseThrow();
+                Sound sound = Gdx.audio.newSound(resource.file());
+                registry.register(location, sound);
+                return sound;
+            }
+
+        };
         ITEMS = new Resource.RegistryAccess<>() {
             @Override
             public String key() {

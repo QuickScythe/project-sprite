@@ -8,7 +8,6 @@ import com.sprite.render.screen.GameScreen;
 import com.sprite.render.ui.UI;
 import com.sprite.resource.ui.InventoryUI;
 
-import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,15 +25,19 @@ public class Inventory extends UI<InventoryUI> {
         VirtualCursor cursor = InputSystem.i().cursor();
         cursor.draw(screen);
         int clickedIndex = type().getClickedIndex(screen);
-        if(clickedIndex != -1){
-            if(items.containsKey(clickedIndex)){
+        if (clickedIndex != -1) {
+            if (items.containsKey(clickedIndex)) {
                 ItemStack stack = items.get(clickedIndex);
-                if(cursor.hold(stack)){
+                if (cursor.hold(stack)) {
                     items.remove(clickedIndex);
+                } else if (stack.equals(cursor.holding())) {
+                    ItemStack newStack = cursor.release();
+                    newStack.amount(newStack.amount() + stack.amount());
+                    items.put(clickedIndex, newStack);
                 }
 
             } else {
-                if(cursor.holding() != null){
+                if (cursor.holding() != null) {
                     items.put(clickedIndex, cursor.release());
                 }
             }
@@ -44,14 +47,22 @@ public class Inventory extends UI<InventoryUI> {
             ItemStack itemStack = entry.getValue();
             int index = entry.getKey();
             Vector2 pos = type().position(screen, index);
+            Vector2 cam = type().cameraOrigin(screen);
             if (!(0 <= index && index < type().rows() * type().columns()))
                 System.out.println("Inventory out of bounds: " + index);
             screen.sprite().draw(
                 itemStack.type().texture().sprite(),
-                pos.x + screen.camera().position.x,
-                pos.y + screen.camera().position.y,
+                pos.x + cam.x,
+                pos.y + cam.y,
                 type().size() * type().scale(),
                 type().size() * type().scale());
+            if (itemStack.amount() > 1) {
+                screen.font().draw(screen.sprite(),
+                    Integer.toString(itemStack.amount()),
+                    pos.x + cam.x + type().size() * type().scale() / 2,
+                    pos.y + cam.y + type().size() * type().scale() / 2
+                );
+            }
         }
     }
 
@@ -64,5 +75,14 @@ public class Inventory extends UI<InventoryUI> {
     public void put(int i, ItemStack itemStack) {
         if (type().hidden(i)) return;
         items.put(i, itemStack);
+    }
+
+    public void add(ItemStack itemStack) {
+        for (int i = 0; i < items.size(); i++) {
+            if (items.containsKey(i)) continue;
+            put(i, itemStack);
+            return;
+        }
+        put(items.size(), itemStack);
     }
 }

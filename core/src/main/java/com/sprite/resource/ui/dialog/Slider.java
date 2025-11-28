@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.sprite.Sounds;
 import com.sprite.data.annotations.Nullable;
 import com.sprite.data.utils.Utils;
 import com.sprite.input.InputAction;
@@ -21,9 +22,14 @@ public class Slider extends DialogElement {
     private final NineSliceSprite slider;
     private final Knob knob;
     @Nullable
-    private final Label label;
+    private final SliderLabel label;
 
     private float value;
+    // Tracks the last value that was committed (on release) to avoid playing a sound on every change
+    private float lastCommittedValue;
+    // Optional settings key to persist value changes
+    @Nullable
+    private String settingsKey;
 
 
     public Slider(String name, String translationKey, float minRange, float maxRange, float defaultValue, float step, boolean label, Vector2 position, Vector2 size, DialogUI dialog) {
@@ -33,9 +39,17 @@ public class Slider extends DialogElement {
         this.step = step;
         this.slider = new NineSliceSprite(Utils.resources().TEXTURES.load("textures:ui/slider"), 48, 48, 48, 48);
         this.knob = new Knob(name, translationKey, position, size, dialog);
-        this.label = label ? new Label(name, translationKey, position, size, dialog) : null;
+        this.label = label ? new SliderLabel(name, translationKey, position, size, dialog) : null;
         this.value = defaultValue;
+        this.lastCommittedValue = defaultValue;
 
+    }
+
+    /**
+     * Assign a settings key so this slider loads/saves its value to preferences.
+     */
+    public void setSettingsKey(String key) {
+        this.settingsKey = key;
     }
 
     @Override
@@ -45,6 +59,10 @@ public class Slider extends DialogElement {
         if (label != null) {
             label.draw(screen, x, y, width, height);
         }
+        if (isJustHovered()) {
+            Sounds.sound("sounds:hover");
+        }
+
     }
 
     @Override
@@ -52,6 +70,7 @@ public class Slider extends DialogElement {
         super.debug(screen, x, y, w, h);
         knob.debug(screen, x, y, w, h);
     }
+
 
     private class Knob extends DialogElement {
 
@@ -108,9 +127,31 @@ public class Slider extends DialogElement {
             // Start dragging if the user pressed on the knob or anywhere on the track
             if (justPressed && (overKnob || overTrack)) {
                 dragging = true;
+
+            }
+            if (dragging) {
+                int volume = Math.round(value);
+                Utils.settings().putInteger(settingsKey, volume);
+                Sounds.volume(volume);
             }
             // Stop dragging on mouse/button release
             if (!pressed) {
+                // If we were dragging and value changed since last commit, persist and play sound once
+                if (dragging) {
+
+
+                    if (settingsKey != null && !settingsKey.isEmpty()) {
+
+                        try {
+                            if (value != lastCommittedValue) {
+                                Utils.settings().flush();
+                                Sounds.sound("sounds:click");
+                                lastCommittedValue = value;
+                            }
+                        } catch (Throwable ignored) {
+                        }
+                    }
+                }
                 dragging = false;
             }
 
@@ -131,7 +172,10 @@ public class Slider extends DialogElement {
                 // Clamp
                 if (snapped < minRange) snapped = minRange;
                 if (snapped > maxRange) snapped = maxRange;
-                value = snapped;
+                if (value != snapped) {
+                    // Update the live value while dragging, but don't persist or play sound yet
+                    value = snapped;
+                }
             }
 
             // Update interaction flags for consumers using DialogElement API
@@ -160,6 +204,17 @@ public class Slider extends DialogElement {
             Knob.this.setInteractionState(hovered, pressed, justClicked);
 
             super.debug(screen, worldPosX, worldPosY, w, h);
+        }
+    }
+
+    public class SliderLabel extends Label {
+        public SliderLabel(String name, String translationKey, Vector2 position, Vector2 size, DialogUI dialog) {
+            super(name, translationKey, position, size, dialog);
+        }
+
+        @Override
+        public String string() {
+            return value + "";
         }
     }
 }

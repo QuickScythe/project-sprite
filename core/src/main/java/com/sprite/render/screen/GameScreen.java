@@ -113,7 +113,6 @@ public abstract class GameScreen implements Screen {
 
     public class UIManager {
 
-        private boolean open = false;
 
         public UI<? extends UIType> build(UIDefinition uiDefinition) {
             if (uiDefinition.type() instanceof InventoryUI type) {
@@ -127,7 +126,7 @@ public abstract class GameScreen implements Screen {
 
         public void draw() {
             for (int i = 1; i <= uis.size(); i++) {
-                if (uis.get(i) != null) uis.get(i).draw(GameScreen.this);
+                if (uis.get(i) != null && uis.get(i).open()) uis.get(i).draw(GameScreen.this);
             }
         }
         public void debug() {
@@ -152,6 +151,10 @@ public abstract class GameScreen implements Screen {
             uis.remove(index);
         }
 
+        public void remove(UI<? extends UIType> ui) {
+            uis.values().removeIf(existingUI -> existingUI == ui);
+        }
+
         public void clear() {
             uis.clear();
         }
@@ -161,18 +164,14 @@ public abstract class GameScreen implements Screen {
         }
 
         public boolean isOpen() {
-            return open;
-        }
-
-        public void open() {
-            open = true;
+            for(UI<? extends UIType> open : uis.values())
+                if(open.open()) return true;
+            return false;
         }
 
         public void close() {
-            open = false;
+            for(UI<? extends UIType> open : uis.values())
+                open.open(false);
         }
-
-
-
     }
 }

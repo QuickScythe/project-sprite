@@ -6,17 +6,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.sprite.data.utils.Utils;
-import com.sprite.game.ItemStack;
-import com.sprite.input.InputAction;
 import com.sprite.input.InputSystem;
 import com.sprite.render.screen.GameScreen;
 import com.sprite.render.ui.UI;
-import com.sprite.render.ui.inventory.Dialog;
-import com.sprite.render.ui.inventory.Inventory;
-import com.sprite.resource.ui.DialogUI;
-import com.sprite.resource.ui.InventoryUI;
-import com.sprite.resource.ui.UIDefinition;
-import com.sprite.resource.ui.UIType;
 
 public class UIEditor {
 
@@ -31,10 +23,10 @@ public class UIEditor {
 
         @Override
         public void create() {
-            ui().addFirst(ui().build(Utils.resources().USER_INTERFACES.load("ui:main_menu")));
+            UI<?> ui = ui().build(Utils.resources().USER_INTERFACES.load("ui:main_menu"));
+            ui.open(true);
+            ui().addFirst(ui);
         }
-
-
 
 
         @Override
@@ -50,7 +42,7 @@ public class UIEditor {
                 ui().add(ui().build(Utils.resources().USER_INTERFACES.load("ui:player/inventory")));
 //                buildUI(Utils.resources().USER_INTERFACES.load("ui:main_menu"));
             }
-            if(Gdx.input.isKeyJustPressed(Input.Keys.I)){
+            if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
                 ui().remove(ui().size());
             }
             // Ensure input system is updated when using this editor screen
@@ -70,7 +62,6 @@ public class UIEditor {
 //            for(EntityType type : Utils.resources().ENTITIES.all()){
 //
 //            sprite().draw(type.model.animations[1].frame(type.model), (camera().viewportWidth/2)-(type.width/2), (camera().viewportHeight/2)-(type.width/2), type.width, type.height);
-
 
 
 //

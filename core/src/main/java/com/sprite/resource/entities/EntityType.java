@@ -6,11 +6,14 @@ import com.sprite.resource.ResourceMeta;
 import com.sprite.resource.controllers.Controller;
 import com.sprite.resource.models.Model;
 import com.sprite.data.utils.Utils;
+import com.sprite.resource.ui.InventoryUI;
+import com.sprite.resource.ui.UIDefinition;
 
 public class EntityType  {
 
     public final Model model;
     public final Controller controller;
+    public final InventoryUI inventoryUI;
     public final int health;
     public final float speed;
     public final TranslatableString name;
@@ -27,6 +30,9 @@ public class EntityType  {
         width = (float) data.get().getDouble("width");
         height = (float) data.get().getDouble("height");
         controller = Utils.resources().CONTROLLERS.load(data.get().getString("controller"));
+        if(!(Utils.resources().USER_INTERFACES.load(data.get().optString("inventory", "ui:player/inventory")).type() instanceof InventoryUI uiDef))
+            throw new IllegalStateException("Inventory UI must be of type INVENTORY");
+        this.inventoryUI = uiDef;
     }
 
 }

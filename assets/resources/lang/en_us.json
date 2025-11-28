@@ -6,5 +6,7 @@
   "ui.button.options": "Options",
   "ui.button.quit": "Exit",
   "ui.button.en": "English",
-  "ui.button.ps": "Pirate"
+  "ui.button.ps": "Pirate",
+  "ui.slider.value": "Value: %value%",
+  "ui.volume.slider": "Volume: %value%%"
 }

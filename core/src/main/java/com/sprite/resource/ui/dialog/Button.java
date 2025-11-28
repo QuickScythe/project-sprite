@@ -1,9 +1,7 @@
 package com.sprite.resource.ui.dialog;
 
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.math.Vector2;
-import com.sprite.data.TranslatableString;
-import com.sprite.data.utils.Texts;
+import com.sprite.Sounds;
 import com.sprite.data.utils.Utils;
 import com.sprite.render.screen.GameScreen;
 import com.sprite.resource.texture.NineSliceSprite;
@@ -36,6 +34,8 @@ public class Button extends DialogElement {
     }
 
     public void click() {
+        Sounds.sound("sounds:click");
+//        Utils.resources().SOUNDS.load("sounds:tap").play();
         if (action == null) return;
         action.invoke();
     }
@@ -63,6 +63,9 @@ public class Button extends DialogElement {
         }
         if (isJustClicked()) {
             click();
+        }
+        if(isJustHovered()){
+            Sounds.sound("sounds:hover");
         }
         label.draw(screen, x, y, width, height);
     }

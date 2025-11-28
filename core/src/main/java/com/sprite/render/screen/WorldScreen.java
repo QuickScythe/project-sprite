@@ -4,10 +4,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.sprite.input.InputAction;
+import com.sprite.input.InputSystem;
+import com.sprite.Sounds;
 import com.sprite.data.registries.Registries;
 import com.sprite.data.utils.Utils;
+import com.sprite.game.ItemStack;
 import com.sprite.game.world.World;
 import com.sprite.game.world.entities.Entity;
+import com.sprite.render.ui.UI;
 import com.sprite.resource.entities.EntityType;
 import com.sprite.resource.magic.elements.Element;
 import com.sprite.resource.magic.elements.Elements;
@@ -34,7 +39,35 @@ public class WorldScreen extends GameScreen {
             screen.sprite().draw(background.sprite(), 0, 0, camera().viewportWidth, camera().viewportHeight);
         });
         pipeline().foreground((screen, delta) -> {
+            // Handle simple movement for the currently focused entity using the InputSystem
+            // Default keyboard mapping uses WASD/Arrow keys via MouseKeyboardInputProvider
+            Entity focused = screen.camera().focus();
+            if (focused != null && !ui().isOpen()) {
+                boolean left = InputSystem.i().isActionPressed(InputAction.MoveLeft);
+                boolean right = InputSystem.i().isActionPressed(InputAction.MoveRight);
+                boolean upJustPressed = InputSystem.i().isActionJustPressed(InputAction.MoveUp);
+
+                // Horizontal movement: A/D (or Left/Right)
+                float dirX = 0f;
+                if (left) dirX -= 1f;
+                if (right) dirX += 1f;
+
+                // Apply horizontal velocity based on the entity's speed while preserving current vertical velocity
+                float targetVx =(dirX * 100) * focused.speed();
+                focused.setVelocity(targetVx, focused.getVelY());
+
+                // Jump on W (or Up) just pressed, if the entity can jump
+                if (upJustPressed && focused.onGround()) {
+                    // Basic jump impulse; keep consistent with existing debug usage (500)
+                    focused.jump(500f);
+                }
+            }
+
+            // Step world and render
             world.render(screen);
+        });
+        pipeline().ui((screen, delta) -> {
+            if (uiManager.isOpen()) ui().draw();
         });
     }
 
@@ -43,13 +76,19 @@ public class WorldScreen extends GameScreen {
         super.render(delta);
         if (!ui().isOpen()) {
             if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-                if (ui().size() == 0)
-                    ui().addFirst(ui().build(Utils.resources().USER_INTERFACES.load("ui:player/inventory")));
-                ui().open();
+                camera().focus().inventory().open(true);
+
+//                if (ui().size() == 0){
+//                    UI<?> ui = ui().build(Utils.resources().USER_INTERFACES.load("ui:player/inventory"));
+//                    ui.open(true);
+//                    ui().addFirst(ui);
+//                }
             }
             if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-                ui().addFirst(ui().build(Utils.resources().USER_INTERFACES.load("ui:main_menu")));
-                ui().open();
+                UI<?> ui = ui().build(Utils.resources().USER_INTERFACES.load("ui:main_menu"));
+                ui.open(true);
+                ui().addFirst(ui);
+
             }
             if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
                 EntityType playerType = Utils.resources().ENTITIES.load("entities:player");
@@ -58,8 +97,11 @@ public class WorldScreen extends GameScreen {
                 player.director.animation("step");
                 System.out.println(player.controller.extra().toString(2));
 
+                player.inventory().add(new ItemStack("items:test", 1));
+//                player.inventory().put(1, new ItemStack(Utils.resources().ITEMS.load("items:test"), 1));
 
-                camera().focus(player);
+                camera().focus(this, player);
+
 
                 EntityType testType = Utils.resources().ENTITIES.load("entities:test");
                 Entity test = world.spawn(testType, new Random().nextInt((int) camera().viewportWidth), 32);
@@ -67,9 +109,32 @@ public class WorldScreen extends GameScreen {
                 test.director.animation("step");
                 System.out.println(test.controller.extra().toString(2));
 
+//                test.inventory().add(new ItemStack("items:test", 1));
+//                test.inventory().put(1, new ItemStack(Utils.resources().ITEMS.load("item:test"), 1));
+
                 JSONObject data = Registries.dump();
                 System.out.println("Registries dump:");
                 System.out.println(data.toString(2));
+
+
+            }
+            if (Gdx.input.isKeyJustPressed(Input.Keys.H)) {
+                EntityType playerType = Utils.resources().ENTITIES.load("entities:test");
+                Entity test = world.spawn(playerType, new Random().nextInt((int) camera().viewportWidth), 200);
+                test.health(10);
+                test.director.animation("step");
+                System.out.println(test.controller.extra().toString(2));
+
+
+                camera().focus(this, test);
+
+
+                EntityType testType = Utils.resources().ENTITIES.load("entities:test");
+                Entity test1 = world.spawn(testType, new Random().nextInt((int) camera().viewportWidth), 32);
+                test1.health(10);
+                test1.director.animation("step");
+                System.out.println(test1.controller.extra().toString(2));
+
 
 
             }

@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.sprite.data.annotations.Nullable;
 import com.sprite.data.utils.Utils;
 import com.sprite.game.world.entities.Entity;
+import com.sprite.render.screen.GameScreen;
 
 public class GameCamera extends OrthographicCamera {
 
@@ -23,8 +24,18 @@ public class GameCamera extends OrthographicCamera {
         this.focus = focus;
     }
 
-    public void focus(@Nullable Entity focus) {
+    public void focus(GameScreen screen, @Nullable Entity focus) {
+        if(focus != null){
+            screen.ui().remove(focus.inventory());
+        }
         this.focus = focus;
+        if(focus == null) return;
+        screen.ui().add(focus.inventory());
+
+    }
+
+    public Entity focus() {
+        return focus;
     }
 
     @Override

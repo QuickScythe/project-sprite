@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.math.Vector3;
+import com.sprite.data.utils.placeholder.PlaceholderUtils;
 import com.sprite.resource.magic.elements.Elements;
 import com.sprite.resource.magic.spells.Spells;
 import org.json.JSONObject;
@@ -27,7 +28,9 @@ public class Utils {
         Utils.game = game;
         resourceManager = new Resources("resources");
         Texts.init();
+        PlaceholderUtils.registerPlaceholders();
         settings = Gdx.app.getPreferences("player_settings");
+
         Texts.lang(Texts.Lang.get(settings.getString("language", Texts.Lang.EN_US.tag)), false);
 
         Elements.initialize();

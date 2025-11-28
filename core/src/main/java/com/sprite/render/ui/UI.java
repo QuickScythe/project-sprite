@@ -6,6 +6,8 @@ import com.sprite.resource.ui.UIType;
 public abstract class UI<T extends UIType> {
 
     T type;
+    boolean open = false;
+
 
     public UI(T type) {
         this.type = type;
@@ -18,4 +20,12 @@ public abstract class UI<T extends UIType> {
     public abstract void draw(GameScreen screen);
 
     public abstract void debug(GameScreen screen);
+
+    public boolean open() {
+        return open;
+    }
+
+    public void open(boolean open) {
+        this.open = open;
+    }
 }

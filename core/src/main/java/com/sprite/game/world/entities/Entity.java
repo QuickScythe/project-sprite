@@ -6,6 +6,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.sprite.data.annotations.Nullable;
 import com.sprite.data.TranslatableString;
 import com.sprite.render.screen.GameScreen;
+import com.sprite.render.ui.UI;
+import com.sprite.render.ui.inventory.Inventory;
 import com.sprite.resource.animations.Animation;
 import com.sprite.resource.animations.AnimationDirector;
 import com.sprite.resource.controllers.Controller;
@@ -13,6 +15,7 @@ import com.sprite.resource.entities.EntityType;
 import com.sprite.resource.models.Model;
 import com.sprite.data.utils.Utils;
 import com.sprite.game.world.World;
+import com.sprite.resource.ui.UIType;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -34,6 +37,7 @@ public class Entity {
     private Entity target = null;
     private Pathfinder.Path path = null;
     private Body body;
+    private final Inventory inventory;
 
 
     public Entity(EntityType type, float x, float y) {
@@ -47,6 +51,7 @@ public class Entity {
         this.height = type.height;
         this.name = type.name;
         this.controller = type.controller.clone();
+        this.inventory = new Inventory(type.inventoryUI);
         //todo replace with collision box
         this.body = new Body(position().x, position().y, width(), height());
         if (controller.input().id().equalsIgnoreCase("input:pathfinder")) {
@@ -218,6 +223,10 @@ public class Entity {
 
     public EntityType type() {
         return type;
+    }
+
+    public Inventory inventory() {
+        return inventory;
     }
 
     public static class Position {

@@ -3,8 +3,9 @@
   "entity.test.name": "Chore Boy",
   "game.title": "Project Sprite",
   "ui.button.play": "ARRGG!!",
-  "ui.button.options": "Som'tin rung",
+  "ui.button.options": "Ah'jus da sails!",
   "ui.button.quit": "Walk ye plank",
   "ui.button.en": "English",
-  "ui.button.ps": "Pirate"
+  "ui.button.ps": "Pirate",
+  "ui.volume.slider": "Shanties: %value%%"
 }
