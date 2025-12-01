@@ -11,7 +11,7 @@ import com.sprite.resource.ui.DialogUI;
  */
 public abstract class DialogElement  {
 
-    private final TranslatableString title;
+    final TranslatableString title;
     private final String name;
     private final Vector2 position;
     private final Vector2 size;

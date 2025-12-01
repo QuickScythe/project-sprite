@@ -68,12 +68,18 @@ public class Texts {
 
     }
 
-    /**
+    /**2228
      * Returns the localized value for the given key, if available. If not found, returns the key string itself.
      * @param key translation key wrapper
      * @return localized string or the key when missing
      */
-    public static String get(TranslatableString key) {
+    public static String get(TranslatableString key,String...args) {
+        String raw = get(key);
+        for(int i = 0; i < args.length; i++) raw = raw.replace("[" + i + "]", args[i]);
+        return raw;
+    }
+
+    private static String get(TranslatableString key){
         if(map.containsKey(key)) return map.get(key);
         for(Map.Entry<TranslatableString, String> entry : map.entrySet()){
             if(entry.getKey().key().equals(key.key()))

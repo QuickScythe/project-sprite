@@ -8,5 +8,5 @@
   "ui.button.en": "English",
   "ui.button.ps": "Pirate",
   "ui.slider.value": "Value: %value%",
-  "ui.volume.slider": "Volume: %value%%"
+  "ui.volume.slider": "Volume: [0]%"
 }
