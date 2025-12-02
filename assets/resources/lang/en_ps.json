@@ -7,5 +7,6 @@
   "ui.button.quit": "Walk ye plank",
   "ui.button.en": "English",
   "ui.button.ps": "Pirate",
-  "ui.volume.slider": "Shanties: %value%%"
+  "ui.volume.slider": "Shanties: [0]%",
+  "ui.slider.value": "Value: [0]"
 }
