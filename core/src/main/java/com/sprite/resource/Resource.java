@@ -163,6 +163,17 @@ public class Resource {
      */
     public record Location(String namespace, String path) {
 
+        /**
+         * Parses a resource location from a string.
+         */
+        public static Location fromString(String resourceLocation) {
+            String[] parts = resourceLocation.split(":");
+            if (parts.length != 2) {
+                throw new IllegalArgumentException("Invalid resource location format: " + resourceLocation);
+            }
+            return new Location(parts[0], parts[1]);
+        }
+
         @Override
         public String toString() {
             return namespace + ":" + path;
@@ -194,7 +205,7 @@ public class Resource {
      *
      * @param <T> the object type stored in the registry
      */
-    public abstract static class RegistryAccess<T extends Object> {
+    public abstract static class RegistryAccess<T> {
 
         /**
          * The backing registry for this resource domain.

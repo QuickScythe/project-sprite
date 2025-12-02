@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.math.Vector2;
 import com.sprite.Viewer;
 import com.sprite.data.utils.Texts;
-import com.sprite.data.utils.placeholder.PlaceholderUtils;
 import com.sprite.render.screen.GameScreen;
 import com.sprite.resource.ui.DialogUI;
 

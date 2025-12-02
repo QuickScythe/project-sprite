@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.sprite.AudioChannel;
 import com.sprite.Sounds;
 import com.sprite.data.annotations.Nullable;
 import com.sprite.data.utils.Utils;
@@ -13,6 +14,8 @@ import com.sprite.render.screen.GameScreen;
 import com.sprite.resource.texture.GameSprite;
 import com.sprite.resource.texture.NineSliceSprite;
 import com.sprite.resource.ui.DialogUI;
+
+import static com.sprite.AudioChannel.MASTER;
 
 public class Slider extends DialogElement {
 
@@ -60,7 +63,7 @@ public class Slider extends DialogElement {
             label.draw(screen, x, y, width, height);
         }
         if (isJustHovered()) {
-            Sounds.sound("sounds:hover");
+            Sounds.play("sounds:hover", AudioChannel.UI);
         }
 
     }
@@ -132,7 +135,7 @@ public class Slider extends DialogElement {
             if (dragging) {
                 int volume = Math.round(value);
                 Utils.settings().putInteger(settingsKey, volume);
-                Sounds.volume(volume);
+                Sounds.volume(MASTER, volume);
             }
             // Stop dragging on mouse/button release
             if (!pressed) {
@@ -145,7 +148,7 @@ public class Slider extends DialogElement {
                         try {
                             if (value != lastCommittedValue) {
                                 Utils.settings().flush();
-                                Sounds.sound("sounds:click");
+                                Sounds.play("sounds:click", AudioChannel.UI);
                                 lastCommittedValue = value;
                             }
                         } catch (Throwable ignored) {

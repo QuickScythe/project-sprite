@@ -52,9 +52,9 @@ public class Main extends Game {
     /**
      * Initializes core systems and sets the first screen.
      * <ul>
-     *   <li>Initializes Resources, Texts, Elements and Spells via {@link Utils#initialize()}.</li>
+     *   <li>Initializes Resources, Texts, Elements and Spells via {@link Utils#initialize(Game)}.</li>
      *   <li>Demonstrates language switching and translation lookups.</li>
-     *   <li>Sets the initial screen to {@link WorldScreen}.</li>
+     *   <li>Sets the initial screen to {@link MenuScreen}.</li>
      * </ul>
      */
     @Override
@@ -62,9 +62,6 @@ public class Main extends Game {
         for (Map.Entry<String, String> entry : LAUNCH_ARGS.entrySet())
             Gdx.app.log("Launcher", "Argument: " + entry.getKey() + " = " + entry.getValue());
         Utils.initialize(this);
-
-
-//        Texts.lang(Texts.Lang.EN_PS.tag);
         if (!LAUNCH_ARGS.containsKey("debugTool")){
             Gdx.app.log("Launcher", "Launching game...");
             setScreen(new MenuScreen());
@@ -110,6 +107,6 @@ public class Main extends Game {
     @Override
     public void setScreen(Screen screen) {
         super.setScreen(screen);
-        if (screen instanceof GameScreen gs) this.screen = gs;
+        if (screen instanceof GameScreen gs) this.screen = gs; else this.screen = null;
     }
 }

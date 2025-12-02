@@ -1,12 +1,15 @@
 package com.sprite.data.utils;
 
 import com.badlogic.gdx.Gdx;
+import com.sprite.render.screen.GameScreen;
 import com.sprite.render.screen.WorldScreen;
 import org.json.JSONObject;
 
 public class ActionUtils {
 
     public static void log(JSONObject data){
+        if(Utils.game().getScreen() instanceof GameScreen screen)
+            screen.requestMusic();
         Gdx.app.log(data.optString("tag", "UIAction"), data.getString("value"));
     }
 

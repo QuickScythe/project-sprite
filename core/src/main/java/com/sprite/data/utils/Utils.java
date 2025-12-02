@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.math.Vector3;
+import com.sprite.AudioChannel;
 import com.sprite.resource.magic.elements.Elements;
 import com.sprite.resource.magic.spells.Spells;
 
@@ -27,6 +28,13 @@ public class Utils {
         resourceManager = new Resources("resources");
         Texts.init();
         settings = Gdx.app.getPreferences("player_settings");
+        //Setup default settings
+        for(AudioChannel channel : AudioChannel.values()){
+            if(settings.contains("volume_" + channel.key())) continue;
+            settings.putInteger("volume_" + channel.key(), channel.defaultVolume());
+
+        }
+        settings().flush();
 
         Texts.lang(Texts.Lang.get(settings.getString("language", Texts.Lang.EN_US.tag)), false);
 
@@ -60,11 +68,22 @@ public class Utils {
         if (shutdown) return;
         shutdown = true;
         try {
+            // Stop any playing/queued audio first
+            try {
+                com.sprite.Sounds.dispose();
+            } catch (Throwable t) {
+                Gdx.app.error("Shutdown", "Error disposing sounds", t);
+            }
             if (resourceManager != null) resourceManager.dispose();
         } catch (Throwable t) {
             Gdx.app.error("Shutdown", "Error disposing resources", t);
         } finally {
             resourceManager = null;
+            try {
+                TaskScheduler.shutdown();
+            } catch (Throwable t) {
+                Gdx.app.error("Shutdown", "Error shutting down scheduler", t);
+            }
         }
     }
 

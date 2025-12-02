@@ -6,19 +6,23 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.sprite.AudioChannel;
+import com.sprite.Sounds;
+import com.sprite.data.utils.Utils;
 import com.sprite.input.InputSystem;
+import com.sprite.input.VirtualCursor;
 import com.sprite.render.RenderPipeline;
 import com.sprite.render.camera.GameCamera;
 import com.sprite.render.ui.UI;
 import com.sprite.render.ui.inventory.Dialog;
 import com.sprite.render.ui.inventory.Inventory;
+import com.sprite.resource.Resource;
 import com.sprite.resource.ui.DialogUI;
 import com.sprite.resource.ui.InventoryUI;
 import com.sprite.resource.ui.UIDefinition;
 import com.sprite.resource.ui.UIType;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public abstract class GameScreen implements Screen {
 
@@ -96,6 +100,8 @@ public abstract class GameScreen implements Screen {
         renderPipeline.background().render(this, delta);
         renderPipeline.foreground().render(this, delta);
         renderPipeline.ui().render(this, delta);
+        VirtualCursor cursor = InputSystem.i().cursor();
+        cursor.draw(this);
         sprite().end();
 
 
@@ -109,6 +115,16 @@ public abstract class GameScreen implements Screen {
 
     public UIManager ui() {
         return uiManager;
+    }
+
+    public void requestMusic() {
+        List<Resource> possible = new ArrayList<>();
+        for (Resource resource : Utils.resources().list("music")) {
+            if (resource.location().path().startsWith("background")) {
+                possible.add(resource);
+            }
+        }
+        Sounds.play(possible.get(new Random().nextInt(possible.size())).location().toString(), AudioChannel.MUSIC);
     }
 
     public class UIManager {

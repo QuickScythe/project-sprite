@@ -1,12 +1,10 @@
 package com.sprite.render.ui.inventory;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.sprite.input.InputAction;
 import com.sprite.input.InputSystem;
-import com.sprite.input.VirtualCursor;
 import com.sprite.render.screen.GameScreen;
 import com.sprite.render.ui.UI;
 import com.sprite.resource.ui.DialogUI;
@@ -53,8 +51,6 @@ public class Dialog extends UI<DialogUI> {
     public void draw(GameScreen screen) {
         screen.shape().setColor(Color.YELLOW);
         type().draw(screen);
-        VirtualCursor cursor = InputSystem.i().cursor();
-        cursor.draw(screen);
         Vector2 cam = type().cameraOrigin(screen);
 
         for (DialogElement element : type().elements().values()) {

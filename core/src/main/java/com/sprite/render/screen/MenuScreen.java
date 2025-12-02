@@ -36,13 +36,7 @@ public class MenuScreen extends GameScreen{
         pipeline().background((screen, delta) -> {
             screen.sprite().draw(background.sprite(), 0, 0, camera().viewportWidth, camera().viewportHeight);
         });
-        List<Resource> possible = new ArrayList<>();
-        for(Resource resource : Utils.resources().list("music")){
-            if(resource.location().path().startsWith("background")){
-                possible.add(resource);
-            }
-        }
-        Sounds.music(possible.get(new Random().nextInt(possible.size())).location().toString());
+        requestMusic();
 
     }
 

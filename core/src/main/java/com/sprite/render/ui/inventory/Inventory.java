@@ -23,7 +23,6 @@ public class Inventory extends UI<InventoryUI> {
     public void draw(GameScreen screen) {
         type().draw(screen);
         VirtualCursor cursor = InputSystem.i().cursor();
-        cursor.draw(screen);
         int clickedIndex = type().getClickedIndex(screen);
         if (clickedIndex != -1) {
             if (items.containsKey(clickedIndex)) {

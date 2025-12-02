@@ -2,16 +2,13 @@ package com.sprite.render.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.ScreenUtils;
-import com.sprite.input.InputAction;
-import com.sprite.input.InputSystem;
-import com.sprite.Sounds;
 import com.sprite.data.registries.Registries;
 import com.sprite.data.utils.Utils;
 import com.sprite.game.ItemStack;
 import com.sprite.game.world.World;
 import com.sprite.game.world.entities.Entity;
+import com.sprite.input.InputAction;
+import com.sprite.input.InputSystem;
 import com.sprite.render.ui.UI;
 import com.sprite.resource.entities.EntityType;
 import com.sprite.resource.magic.elements.Element;
@@ -53,7 +50,7 @@ public class WorldScreen extends GameScreen {
                 if (right) dirX += 1f;
 
                 // Apply horizontal velocity based on the entity's speed while preserving current vertical velocity
-                float targetVx =(dirX * 100) * focused.speed();
+                float targetVx = (dirX * 100) * focused.speed();
                 focused.setVelocity(targetVx, focused.getVelY());
 
                 // Jump on W (or Up) just pressed, if the entity can jump
@@ -69,6 +66,25 @@ public class WorldScreen extends GameScreen {
         pipeline().ui((screen, delta) -> {
             if (uiManager.isOpen()) ui().draw();
         });
+
+        EntityType playerType = Utils.resources().ENTITIES.load("entities:player");
+        Entity player = world.spawn(playerType, new Random().nextInt((int) camera().viewportWidth), 200);
+        player.health(10);
+        player.director.animation("step");
+        System.out.println(player.controller.extra().toString(2));
+
+        player.inventory().add(new ItemStack("items:test", 1));
+//                player.inventory().put(1, new ItemStack(Utils.resources().ITEMS.load("items:test"), 1));
+
+        camera().focus(this, player);
+
+
+        EntityType testType = Utils.resources().ENTITIES.load("entities:test");
+        Entity test = world.spawn(testType, new Random().nextInt((int) camera().viewportWidth), 32);
+        test.health(10);
+        test.director.animation("step");
+
+        requestMusic();
     }
 
     @Override
@@ -76,7 +92,8 @@ public class WorldScreen extends GameScreen {
         super.render(delta);
         if (!ui().isOpen()) {
             if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-                camera().focus().inventory().open(true);
+                if (camera().focus() != null)
+                    camera().focus().inventory().open(true);
 
 //                if (ui().size() == 0){
 //                    UI<?> ui = ui().build(Utils.resources().USER_INTERFACES.load("ui:player/inventory"));
@@ -134,7 +151,6 @@ public class WorldScreen extends GameScreen {
                 test1.health(10);
                 test1.director.animation("step");
                 System.out.println(test1.controller.extra().toString(2));
-
 
 
             }
