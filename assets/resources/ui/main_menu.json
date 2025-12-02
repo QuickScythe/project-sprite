@@ -130,7 +130,7 @@
           "label": "ui.volume.slider",
           "min": 0,
           "max": 100,
-          "value": "${settings:volume|75}",
+          "value": "${settings:volume_master|75}",
           "step": 1
         }
       }

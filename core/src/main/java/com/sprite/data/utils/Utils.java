@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.math.Vector3;
 import com.sprite.AudioChannel;
+import com.sprite.Sounds;
 import com.sprite.resource.magic.elements.Elements;
 import com.sprite.resource.magic.spells.Spells;
 
@@ -36,10 +37,12 @@ public class Utils {
         }
         settings().flush();
 
+
         Texts.lang(Texts.Lang.get(settings.getString("language", Texts.Lang.EN_US.tag)), false);
 
         Elements.initialize();
         Spells.initialize();
+        Sounds.initialize();
 
         Gdx.app.log("Initialization", "Resources Initialized. Game ready to launch");
     }

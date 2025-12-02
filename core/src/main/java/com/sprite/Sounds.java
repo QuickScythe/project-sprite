@@ -25,7 +25,8 @@ public class Sounds {
 
     public static void initialize() {
         for (AudioChannel channel : AudioChannel.values()) {
-            volumeMap.put(channel, Utils.settings().getInteger("volume_" + channel.key(), channel.defaultVolume()));
+            volumeMap.put(channel, Utils.settings().getInteger("volume_" + channel.key()));
+            System.out.println("Volume (" + channel.key() + "): " + volumeMap.get(channel));
         }
     }
 
@@ -40,7 +41,6 @@ public class Sounds {
     }
 
     public static void volume(AudioChannel channel, int volume) {
-        System.out.println("Volume: " + volume);
         volumeMap.put(channel, volume);
         for (Music music : Sounds.music) music.setVolume(mix(channel));
         for (Map.Entry<Long, Sound> entry : sounds.entrySet()) {
@@ -59,7 +59,7 @@ public class Sounds {
             music.dispose();
         }
         Music sound = Utils.resources().MUSIC.load(resourceLocation);
-        sound.setVolume(Utils.settings().getInteger("volume_" + channel.key()) / 100f);
+        sound.setVolume(mix(channel));
         sound.play();
         sound.setOnCompletionListener((finished) -> {
             music.remove(finished);
@@ -73,16 +73,17 @@ public class Sounds {
     public static void music(String resourceLocation, AudioChannel channel) {
 
         Music sound = Utils.resources().MUSIC.load(resourceLocation);
-        sound.setVolume(Utils.settings().getInteger("volume_" + channel.key()) / 100f);
+        sound.setVolume(mix(channel));
         sound.play();
         sound.setOnCompletionListener(music::remove);
         music.add(sound);
     }
 
     public static void sound(String resourceLocation, AudioChannel channel) {
+        Gdx.app.log("Sounds", "Now playing: " + resourceLocation);
         Sound sound = Utils.resources().SOUNDS.load(resourceLocation);
         long id = sound.play();
-        sound.setVolume(id, Utils.settings().getInteger("volume_" + channel.key()) / 100f);
+        sound.setVolume(id, mix(channel));
         sounds.put(id, sound);
 
 
