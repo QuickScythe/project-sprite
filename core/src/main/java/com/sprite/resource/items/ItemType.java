@@ -11,7 +11,7 @@ public class ItemType {
     private final Resource.Location location;
 
     public ItemType(Resource resource) {
-        if(!resource.type().equals(Resource.Type.DATA)) throw new IllegalStateException("Controller resource must be of type DATA");
+        if(!resource.type().equals(Resource.Type.DATA)) throw new IllegalStateException("Item resource must be of type DATA");
         ResourceMeta.Json data = (ResourceMeta.Json) resource.data.data();
         texture = Utils.resources().TEXTURES.load(data.get().optString("texture", "textures:missing"));
         this.location = resource.location();
