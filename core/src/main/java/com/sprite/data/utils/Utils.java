@@ -4,8 +4,10 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.math.Vector3;
-import com.sprite.AudioChannel;
-import com.sprite.Sounds;
+import com.sprite.data.utils.audio.AudioChannel;
+import com.sprite.data.utils.audio.Sounds;
+import com.sprite.data.utils.resources.Resources;
+import com.sprite.data.utils.resources.Texts;
 import com.sprite.resource.magic.elements.Elements;
 import com.sprite.resource.magic.spells.Spells;
 
@@ -73,7 +75,7 @@ public class Utils {
         try {
             // Stop any playing/queued audio first
             try {
-                com.sprite.Sounds.dispose();
+                Sounds.dispose();
             } catch (Throwable t) {
                 Gdx.app.error("Shutdown", "Error disposing sounds", t);
             }

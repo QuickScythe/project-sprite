@@ -4,10 +4,10 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.sprite.AudioChannel;
-import com.sprite.Sounds;
 import com.sprite.data.annotations.Nullable;
 import com.sprite.data.utils.Utils;
+import com.sprite.data.utils.audio.AudioChannel;
+import com.sprite.data.utils.audio.Sounds;
 import com.sprite.input.InputAction;
 import com.sprite.input.InputSystem;
 import com.sprite.render.screen.GameScreen;
@@ -15,7 +15,7 @@ import com.sprite.resource.texture.GameSprite;
 import com.sprite.resource.texture.NineSliceSprite;
 import com.sprite.resource.ui.DialogUI;
 
-import static com.sprite.AudioChannel.MASTER;
+import java.util.Locale;
 
 public class Slider extends DialogElement {
 
@@ -124,8 +124,8 @@ public class Slider extends DialogElement {
             boolean overTrack = world.x >= trackX && world.x <= trackX + trackW && world.y >= trackY && world.y <= trackY + trackH;
             boolean overKnob = world.x >= knobX && world.x <= knobX + knobWidth && world.y >= knobY && world.y <= knobY + knobH;
 
-            boolean justPressed = InputSystem.i().isActionJustPressed(InputAction.Primary);
-            boolean pressed = InputSystem.i().isActionPressed(InputAction.Primary);
+            boolean justPressed = InputSystem.i().isActionJustPressed(InputAction.PRIMARY);
+            boolean pressed = InputSystem.i().isActionPressed(InputAction.PRIMARY);
 
             // Start dragging if the user pressed on the knob or anywhere on the track
             if (justPressed && (overKnob || overTrack)) {
@@ -133,26 +133,27 @@ public class Slider extends DialogElement {
 
             }
             if (dragging) {
-                int volume = Math.round(value);
-                Utils.settings().putInteger(settingsKey, volume);
-                Sounds.volume(MASTER, volume);
+                if (settingsKey != null && !settingsKey.isEmpty()) {
+                    if (settingsKey.toLowerCase(Locale.ENGLISH).startsWith("volume_")) {
+                        int volume = Math.round(value);
+                        Utils.settings().putInteger(settingsKey, volume);
+                        String channel = settingsKey.replace("volume_", "");
+                        Sounds.volume(AudioChannel.valueOf(channel.toUpperCase(Locale.ENGLISH)), volume);
+                    }
+                }
+
             }
             // Stop dragging on mouse/button release
             if (!pressed) {
                 // If we were dragging and value changed since last commit, persist and play sound once
                 if (dragging) {
-
-
-                    if (settingsKey != null && !settingsKey.isEmpty()) {
-
-                        try {
-                            if (value != lastCommittedValue) {
-                                Utils.settings().flush();
-                                Sounds.play("sounds:click", AudioChannel.UI);
-                                lastCommittedValue = value;
-                            }
-                        } catch (Throwable ignored) {
+                    try {
+                        if (value != lastCommittedValue) {
+                            Utils.settings().flush();
+                            Sounds.play("sounds:click", AudioChannel.UI);
+                            lastCommittedValue = value;
                         }
+                    } catch (Throwable ignored) {
                     }
                 }
                 dragging = false;
@@ -202,8 +203,8 @@ public class Slider extends DialogElement {
             float worldPosX = cam.x + (pos.x - w / 2 + (w1 * percent)) + (dialog().gridWidthSize());
             float worldPosY = cam.y + pos.y;
             boolean hovered = world.x >= worldPosX && world.x <= worldPosX + w && world.y >= worldPosY && world.y <= worldPosY + h;
-            boolean pressed = hovered && InputSystem.i().isActionPressed(InputAction.Primary);
-            boolean justClicked = hovered && InputSystem.i().isActionJustPressed(InputAction.Primary);
+            boolean pressed = hovered && InputSystem.i().isActionPressed(InputAction.PRIMARY);
+            boolean justClicked = hovered && InputSystem.i().isActionJustPressed(InputAction.PRIMARY);
             Knob.this.setInteractionState(hovered, pressed, justClicked);
 
             super.debug(screen, worldPosX, worldPosY, w, h);

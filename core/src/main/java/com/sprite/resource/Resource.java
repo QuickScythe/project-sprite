@@ -4,9 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.sprite.data.registries.Registries;
 import com.sprite.data.registries.Registry;
+import com.sprite.data.utils.Utils;
 
 import java.util.Collection;
 import java.util.Locale;
+import java.util.function.Function;
 
 import static com.sprite.resource.Resource.Type.DATA;
 
@@ -207,6 +209,11 @@ public class Resource {
      */
     public abstract static class RegistryAccess<T> {
 
+        Function<Resource, T> creator;
+        public RegistryAccess(Function<Resource, T> creator) {
+            this.creator = creator;
+        }
+
         /**
          * The backing registry for this resource domain.
          */
@@ -223,7 +230,17 @@ public class Resource {
          * @param location resource location string (namespace:path)
          * @return loaded object instance
          */
-        public abstract T load(String location);
+        public T load(String location) {
+            if (registry.get(location).isPresent()) {
+                Gdx.app.debug("Resource", key() + " already loaded: " + location);
+                return registry.get(location).get();
+            }
+            Gdx.app.log("Resource", "Loading " + key() + ": " + location);
+            Resource raw = Utils.resources().get(location).orElseThrow();
+            T resource = creator.apply(raw);
+            registry.register(location, resource);
+            return resource;
+        }
 
         public Collection<T> all() {
             return registry.values();

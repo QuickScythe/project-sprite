@@ -1,6 +1,7 @@
 package com.sprite.resource.ui;
 
 import com.badlogic.gdx.Gdx;
+import com.sprite.data.utils.ActionUtils;
 import com.sprite.resource.Resource;
 import com.sprite.resource.ResourceMeta;
 import org.json.JSONArray;
@@ -27,7 +28,7 @@ public class UIAction {
     }
 
     private void load(JSONObject data){
-        String className = data.optString("class", "com.sprite.data.utils.ActionUtils");
+        String className = data.optString("class", ActionUtils.class.getName());
         try {
             clazz = Class.forName(className);
             JSONArray methodArgTypes = data.optJSONArray("arguments", new JSONArray());

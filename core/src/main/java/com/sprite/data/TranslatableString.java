@@ -1,6 +1,6 @@
 package com.sprite.data;
 
-import com.sprite.data.utils.Texts;
+import com.sprite.data.utils.resources.Texts;
 
 /**
  * Wrapper for i18n translation keys used with {@link Texts}.

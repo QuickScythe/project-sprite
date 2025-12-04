@@ -1,8 +1,8 @@
 package com.sprite.resource.ui.dialog;
 
 import com.badlogic.gdx.math.Vector2;
-import com.sprite.AudioChannel;
-import com.sprite.Sounds;
+import com.sprite.data.utils.audio.AudioChannel;
+import com.sprite.data.utils.audio.Sounds;
 import com.sprite.data.utils.Utils;
 import com.sprite.render.screen.GameScreen;
 import com.sprite.resource.texture.NineSliceSprite;
@@ -36,7 +36,6 @@ public class Button extends DialogElement {
 
     public void click() {
         Sounds.play("sounds:click", AudioChannel.UI);
-//        Utils.resources().SOUNDS.load("sounds:tap").play();
         if (action == null) return;
         action.invoke();
     }
