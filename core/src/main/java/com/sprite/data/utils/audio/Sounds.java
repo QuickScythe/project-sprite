@@ -1,4 +1,4 @@
-package com.sprite;
+package com.sprite.data.utils.audio;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
@@ -20,8 +20,14 @@ public class Sounds {
 
     private static final List<Music> music = new ArrayList<>();
     private static final Map<Long, Sound> sounds = new HashMap<>();
+    // Track which channel each active instance belongs to
+    private static final Map<Music, AudioChannel> musicChannels = new IdentityHashMap<>();
+    private static final Map<Long, AudioChannel> soundChannels = new HashMap<>();
     private static final Map<AudioChannel, Integer> volumeMap = new EnumMap<>(AudioChannel.class);
-    private static volatile boolean shuttingDown = false;
+    // Cache parsed audio durations to avoid repeated file I/O per play
+    private static final Map<String, Long> durationCache = new HashMap<>();
+    // Toggle verbose logging if needed during development
+    private static final boolean DEBUG_LOG = false;
 
     public static void initialize() {
         for (AudioChannel channel : AudioChannel.values()) {
@@ -42,9 +48,27 @@ public class Sounds {
 
     public static void volume(AudioChannel channel, int volume) {
         volumeMap.put(channel, volume);
-        for (Music music : Sounds.music) music.setVolume(mix(channel));
+        // Precompute master scalar to avoid repeated map lookups and divisions
+        float masterScalar = volumeMap.get(AudioChannel.MASTER) / 100f;
+
+        // Update only affected instances: all when MASTER changes, otherwise only that channel
+        for (Music m : Sounds.music) {
+            AudioChannel ch = musicChannels.get(m);
+            if (ch == null) continue; // safety
+            if (channel == AudioChannel.MASTER || ch == channel) {
+                float chScalar = (ch == AudioChannel.MASTER) ? 1f : (volumeMap.get(ch) / 100f);
+                m.setVolume(chScalar * masterScalar);
+            }
+        }
         for (Map.Entry<Long, Sound> entry : sounds.entrySet()) {
-            entry.getValue().setVolume(entry.getKey(), volume / 100f);
+            Long id = entry.getKey();
+            Sound s = entry.getValue();
+            AudioChannel ch = soundChannels.get(id);
+            if (ch == null) continue;
+            if (channel == AudioChannel.MASTER || ch == channel) {
+                float chScalar = (ch == AudioChannel.MASTER) ? 1f : (volumeMap.get(ch) / 100f);
+                s.setVolume(id, chScalar * masterScalar);
+            }
         }
     }
 
@@ -53,20 +77,23 @@ public class Sounds {
     }
 
     public static void background(String resourceLocation, AudioChannel channel) {
-        Gdx.app.log("Sounds", "Now playing: " + resourceLocation);
+        if (DEBUG_LOG) Gdx.app.log("Sounds", "Now playing (bg): " + resourceLocation);
         for (Music music : Sounds.music) {
             music.stop();
             music.dispose();
+            musicChannels.remove(music);
         }
         Music sound = Utils.resources().MUSIC.load(resourceLocation);
         sound.setVolume(mix(channel));
         sound.play();
         sound.setOnCompletionListener((finished) -> {
             music.remove(finished);
+            musicChannels.remove(finished);
             if (Utils.game().getScreen() instanceof GameScreen screen)
                 screen.requestMusic();
         });
         music.add(sound);
+        musicChannels.put(sound, channel);
     }
 
 
@@ -75,19 +102,24 @@ public class Sounds {
         Music sound = Utils.resources().MUSIC.load(resourceLocation);
         sound.setVolume(mix(channel));
         sound.play();
-        sound.setOnCompletionListener(music::remove);
+        sound.setOnCompletionListener((finished) -> {
+            music.remove(finished);
+            musicChannels.remove(finished);
+        });
         music.add(sound);
+        musicChannels.put(sound, channel);
     }
 
     public static void sound(String resourceLocation, AudioChannel channel) {
-        Gdx.app.log("Sounds", "Now playing: " + resourceLocation);
+        if (DEBUG_LOG) Gdx.app.log("Sounds", "Now playing (sfx): " + resourceLocation);
         Sound sound = Utils.resources().SOUNDS.load(resourceLocation);
         long id = sound.play();
         sound.setVolume(id, mix(channel));
         sounds.put(id, sound);
+        soundChannels.put(id, channel);
 
 
-        long durationMs = getWavDurationMs(Utils.resources().get(resourceLocation).orElseThrow().file()); // you implement this
+        long durationMs = getDurationMs(resourceLocation, Utils.resources().get(resourceLocation).orElseThrow().file());
         long safetySlackMs = 30; // small buffer for latency
         TaskScheduler.scheduleAsyncTask(() -> {
             // If you modify LibGDX objects or game state, do it on the render thread:
@@ -98,22 +130,50 @@ public class Sounds {
                 } catch (Throwable ignored) {
                 }
                 sounds.remove(id);
+                soundChannels.remove(id);
             });
         }, durationMs + safetySlackMs, TimeUnit.MILLISECONDS);
     }
 
     static long getWavDurationMs(FileHandle fh) {
+        // Backwards-compat method; use uncached path
+        return parseWavDurationSafe(fh, 1000L);
+    }
+
+    /**
+     * Returns duration (ms) for the provided resource, using an in-memory cache to avoid
+     * repeated file I/O. Supports WAV header parsing; for other formats or failures,
+     * falls back to a sane default short duration to ensure scheduled cleanup still occurs.
+     */
+    static long getDurationMs(String resourceLocation, FileHandle fh) {
+        Long cached = durationCache.get(resourceLocation);
+        if (cached != null) return cached;
+
+        long duration;
+        String name = fh.name().toLowerCase(Locale.ROOT);
+        if (name.endsWith(".wav")) {
+            duration = parseWavDurationSafe(fh, 1000L);
+        } else {
+            // Unsupported precise parsing – choose a conservative default
+            duration = 1000L; // 1 second default for short UI/SFX clicks
+        }
+        durationCache.put(resourceLocation, duration);
+        return duration;
+    }
+
+    private static long parseWavDurationSafe(FileHandle fh, long fallbackMs) {
         try (DataInputStream in = new DataInputStream(fh.read())) {
-            // Skip RIFF header to fmt and data chunks (production code should actually parse chunks)
             byte[] header = new byte[44];
             in.readFully(header);
-            int sampleRate = ByteBuffer.wrap(header, 24, 4).order(ByteOrder.LITTLE_ENDIAN).getInt();
             int byteRate = ByteBuffer.wrap(header, 28, 4).order(ByteOrder.LITTLE_ENDIAN).getInt();
             int dataSize = ByteBuffer.wrap(header, 40, 4).order(ByteOrder.LITTLE_ENDIAN).getInt();
+            if (byteRate <= 0) return fallbackMs;
             float seconds = (float) dataSize / (float) byteRate;
-            return (long) (seconds * 1000f);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            long ms = (long) (seconds * 1000f);
+            // Guard against zero/absurd values
+            return ms > 0 ? ms : fallbackMs;
+        } catch (Throwable ignored) {
+            return fallbackMs;
         }
     }
 
@@ -122,7 +182,6 @@ public class Sounds {
      * and prevents further task rescheduling. Safe to call multiple times.
      */
     public static void dispose() {
-        shuttingDown = true;
         // Stop music
         for (Music m : new ArrayList<>(music)) {
             try {
@@ -135,6 +194,7 @@ public class Sounds {
             }
         }
         music.clear();
+        musicChannels.clear();
 
         // Stop and dispose sounds
         for (Map.Entry<Long, Sound> e : new ArrayList<>(sounds.entrySet())) {
@@ -149,5 +209,16 @@ public class Sounds {
             }
         }
         sounds.clear();
+        soundChannels.clear();
+        durationCache.clear();
+    }
+
+    // Query helpers to inspect current routing
+    public static Optional<AudioChannel> channelOf(Music m) {
+        return Optional.ofNullable(musicChannels.get(m));
+    }
+
+    public static Optional<AudioChannel> channelOf(long soundId) {
+        return Optional.ofNullable(soundChannels.get(soundId));
     }
 }

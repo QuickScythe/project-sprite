@@ -1,7 +1,8 @@
-package com.sprite.data.utils;
+package com.sprite.data.utils.resources;
 
 import com.badlogic.gdx.Gdx;
 import com.sprite.data.TranslatableString;
+import com.sprite.data.utils.Utils;
 import com.sprite.resource.Resource;
 import org.json.JSONObject;
 

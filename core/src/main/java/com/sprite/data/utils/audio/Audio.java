@@ -1,4 +1,4 @@
-package com.sprite;
+package com.sprite.data.utils.audio;
 
 public class Audio<T extends Audio.Type> {
 

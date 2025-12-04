@@ -1,4 +1,4 @@
-package com.sprite;
+package com.sprite.data.utils.audio;
 
 public enum AudioChannel {
     MASTER("master", 50),

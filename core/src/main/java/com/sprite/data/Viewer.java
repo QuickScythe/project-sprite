@@ -1,4 +1,4 @@
-package com.sprite;
+package com.sprite.data;
 
 public interface Viewer {
 

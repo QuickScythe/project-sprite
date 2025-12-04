@@ -1,4 +1,4 @@
-package com.sprite.data.utils;
+package com.sprite.data.utils.resources;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
@@ -6,6 +6,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.sprite.data.registries.Registries;
 import com.sprite.data.registries.Registry;
+import com.sprite.data.utils.Utils;
 import com.sprite.resource.Resource;
 import com.sprite.resource.ResourceMeta;
 import com.sprite.resource.animations.Animation;
@@ -13,8 +14,10 @@ import com.sprite.resource.controllers.Controller;
 import com.sprite.resource.entities.EntityType;
 import com.sprite.resource.input.Input;
 import com.sprite.resource.items.ItemType;
+import com.sprite.resource.loot.LootTable;
 import com.sprite.resource.models.Model;
 import com.sprite.resource.texture.GameSprite;
+import com.sprite.resource.tiles.TileType;
 import com.sprite.resource.ui.UIAction;
 import com.sprite.resource.ui.UIDefinition;
 import org.json.JSONObject;
@@ -23,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import static com.sprite.resource.Resource.Type.DATA;
 
@@ -66,10 +70,7 @@ public class Resources {
      * Registry access wrapper for UIs.
      */
     public final Resource.RegistryAccess<UIDefinition> USER_INTERFACES;
-    /**
-     * Registry access wrapper for Items.
-     */
-    public final Resource.RegistryAccess<ItemType> ITEMS;
+
     /**
      * Registry access wrapper for UI Actions.
      */
@@ -86,151 +87,52 @@ public class Resources {
     public final Resource.RegistryAccess<Sound> SOUNDS;
 
     /**
+     * Registry access wrapper for tiles
+     */
+    public final Resource.RegistryAccess<TileType> TILES;
+
+    /**
+     * Registry access wrapper for Items.
+     */
+    public final Resource.RegistryAccess<ItemType> ITEMS;
+
+    /**
+     * Registry access wrapper for loot tables.
+     */
+    public final Resource.RegistryAccess<LootTable> LOOT;
+
+    /**
      * Creates a Resources manager, scanning both internal (classpath) and external (local) assets
      * under the provided root folder.
      *
      * @param rootFolder the root assets folder (e.g., "resources")
      */
     public Resources(String rootFolder) {
-        MUSIC = new Resource.RegistryAccess<>() {
+        LOOT = new Resource.RegistryAccess<>(null) {
             @Override
             public String key() {
-                return "music";
+                return "loot";
             }
 
             @Override
-            public Music load(String location) {
-                Resource resource = Utils.resources().get(location).orElseThrow();
-                return Gdx.audio.newMusic(resource.file());
-            }
-
-
-        };
-        SOUNDS = new Resource.RegistryAccess<>() {
-            @Override
-            public String key() {
-                return "sounds";
-            }
-            @Override
-            public Sound load(String location) {
-                if (registry.get(location).isPresent()) {
-                    Gdx.app.debug("Resource", "Sound already loaded: " + location);
-                    return registry.get(location).get();
-                }
-                Gdx.app.log("Resource", "Loading sound: " + location);
-                Resource resource = Utils.resources().get(location).orElseThrow();
-                Sound sound = Gdx.audio.newSound(resource.file());
-                registry.register(location, sound);
-                return sound;
+            public LootTable load(String location) {
+                return null;
             }
 
         };
-        ITEMS = new Resource.RegistryAccess<>() {
-            @Override
-            public String key() {
-                return "items";
-            }
-
-            @Override
-            public ItemType load(String location) {
-                if (registry.get(location).isPresent()) {
-                    Gdx.app.debug("Resource", "UI already loaded: " + location);
-                    return registry.get(location).get();
-                }
-                Gdx.app.log("Resource", "Loading UI: " + location);
-                Resource resource = Utils.resources().get(location).orElseThrow();
-                ItemType itemType = new ItemType(resource);
-                registry.register(location, itemType);
-                return itemType;
-            }
-
-        };
-        ACTIONS = new Resource.RegistryAccess<>() {
-            @Override
-            public String key() {
-                return "actions";
-            }
-
-            @Override
-            public UIAction load(String location) {
-                if (registry.get(location).isPresent()) {
-                    Gdx.app.debug("Resource", "UI already loaded: " + location);
-                    return registry.get(location).get();
-                }
-                Gdx.app.log("Resource", "Loading UI Action: " + location);
-                Resource resource = Utils.resources().get(location).orElseThrow();
-                UIAction actionDef = new UIAction(resource);
-                registry.register(location, actionDef);
-                return actionDef;
-            }
-
-        };
-        USER_INTERFACES = new Resource.RegistryAccess<>() {
-            @Override
-            public String key() {
-                return "ui";
-            }
-
-            @Override
-            public UIDefinition load(String location) {
-                if (registry.get(location).isPresent()) {
-                    Gdx.app.debug("Resource", "UI already loaded: " + location);
-                    return registry.get(location).get();
-                }
-                Gdx.app.log("Resource", "Loading UI: " + location);
-                Resource resource = Utils.resources().get(location).orElseThrow();
-                UIDefinition uidef = new UIDefinition(resource);
-                registry.register(location, uidef);
-                return uidef;
-            }
-        };
-        INPUTS = new Resource.RegistryAccess<>() {
-            @Override
-            public String key() {
-                return "input";
-            }
-
-            @Override
-            public Input load(String location) {
-                Input input = new Input(location);
-                registry.register(location, input);
-                return input;
-            }
-        };
-        CONTROLLERS = registerRegistry("controllers", (location, registry) -> {
-            if (registry.get(location).isPresent()) {
-                Gdx.app.debug("Resource", "Controller already loaded: " + location);
-                return registry.get(location).get();
-            }
-            Gdx.app.log("Resource", "Loading controller: " + location);
+        MUSIC = registerRegistry("music", (location,r) -> {
             Resource resource = Utils.resources().get(location).orElseThrow();
-            Controller controller = new Controller(resource);
-            registry.register(location, controller);
-            return controller;
+            return Gdx.audio.newMusic(resource.file());
         });
-        MODELS = registerRegistry("models", (location, registry) -> {
-            if (registry.get(location).isPresent()) {
-                Gdx.app.debug("Resource", "Model already loaded: " + location);
-                return registry.get(location).get();
-            }
-            Gdx.app.log("Resource", "Loading model: " + location);
-            Resource resource = Utils.resources().get(location).orElseThrow();
-            Model model = new Model(resource);
-            registry.register(location, model);
-            return model;
-        });
-        ANIMATIONS = registerRegistry("animations", (location, registry) -> {
-            if (registry.get(location).isPresent()) {
-                Gdx.app.debug("Resource", "Animation already loaded: " + location);
-                return registry.get(location).get();
-            }
-            Gdx.app.log("Resource", "Loading animation: " + location);
-            Resource resource = Utils.resources().get(location).orElseThrow();
-            Animation animation = new Animation(resource);
-
-            registry.register(location, animation);
-            return animation;
-        });
+        SOUNDS = registerRegistry("sounds", resource -> Gdx.audio.newSound(resource.file()));
+        TILES = registerRegistry("tiles", TileType::new);
+        ITEMS = registerRegistry("items", ItemType::new);
+        ACTIONS = registerRegistry("actions", UIAction::new);
+        USER_INTERFACES = registerRegistry("ui", UIDefinition::new);
+        INPUTS = registerRegistry("input", Input::new);
+        CONTROLLERS = registerRegistry("controllers", Controller::new);
+        MODELS = registerRegistry("models", Model::new);
+        ANIMATIONS = registerRegistry("animations", Animation::new);
         TEXTURES = registerRegistry("textures", (location, registry) -> {
             if (registry.get(location).isPresent()) {
                 Gdx.app.debug("Resource", "Texture already loaded: " + location);
@@ -242,18 +144,7 @@ public class Resources {
             registry.register(location, sprite);
             return sprite;
         });
-        ENTITIES = registerRegistry("entities", (location, registry) -> {
-            if (registry.get(location).isPresent()) {
-                Gdx.app.debug("Resource", "Texture already loaded: " + location);
-                return registry.get(location).get();
-            }
-            Gdx.app.log("Resource", "Loading entity: " + location);
-            Resource resource = Utils.resources().get(location).orElseThrow();
-            EntityType sprite = new EntityType(resource);
-            registry.register(location, sprite);
-            return sprite;
-        });
-
+        ENTITIES = registerRegistry("entities", EntityType::new);
         FileHandle handle = Gdx.files.classpath("assets.txt");
         String read = handle.readString();
         loadInternal(rootFolder, read);
@@ -306,6 +197,16 @@ public class Resources {
         }
     }
 
+    private <T> Resource.RegistryAccess<T> registerRegistry(String key, Function<Resource, T> creator){
+        Gdx.app.log("Resource", "Registering resource registry: " + key);
+        return new Resource.RegistryAccess<>(creator) {
+            @Override
+            public String key() {
+                return key;
+            }
+        };
+    }
+
     /**
      * Utility to build a typed registry for a specific resource domain.
      *
@@ -314,7 +215,7 @@ public class Resources {
      */
     private <T> Resource.RegistryAccess<T> registerRegistry(String key, BiFunction<String, Registry<T>, T> load) {
         Gdx.app.log("Resource", "Registering resource registry: " + key);
-        return new Resource.RegistryAccess<>() {
+        return new Resource.RegistryAccess<>(null) {
             @Override
             public String key() {
                 return key;
