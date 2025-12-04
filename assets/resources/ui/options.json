@@ -1,0 +1,111 @@
+{
+  "type": "dialog",
+  "texture": "textures:ui/menu",
+  "dialog": {
+    "rows": 16,
+    "columns": 12,
+    "items": {
+      "title_label": {
+        "type": "label",
+        "position": [
+          2,
+          12
+        ],
+        "scale": [
+          8,
+          2
+        ],
+        "label": {
+          "title": "ui.options.title"
+        }
+      },
+      "master_slider": {
+        "type": "slider",
+        "position": [
+          2,
+          10
+        ],
+        "scale": [
+          8,
+          2
+        ],
+        "slider": {
+          "label": "ui.volume.slider_master",
+          "min": 0,
+          "max": 100,
+          "value": "${settings:volume_master|75}",
+          "step": 1
+        }
+      },
+      "music_slider": {
+        "type": "slider",
+        "position": [
+          2,
+          8
+        ],
+        "scale": [
+          8,
+          2
+        ],
+        "slider": {
+          "label": "ui.volume.slider_music",
+          "min": 0,
+          "max": 100,
+          "value": "${settings:volume_music|75}",
+          "step": 1
+        }
+      },
+      "sfx_slider": {
+        "type": "slider",
+        "position": [
+          2,
+          6
+        ],
+        "scale": [
+          8,
+          2
+        ],
+        "slider": {
+          "label": "ui.volume.slider_sfx",
+          "min": 0,
+          "max": 100,
+          "value": "${settings:volume_sfx|75}",
+          "step": 1
+        }
+      },
+      "ui_slider": {
+        "type": "slider",
+        "position": [
+          2,
+          4
+        ],
+        "scale": [
+          8,
+          2
+        ],
+        "slider": {
+          "label": "ui.volume.slider_ui",
+          "min": 0,
+          "max": 100,
+          "value": "${settings:volume_ui|75}",
+          "step": 1
+        }
+      },
+      "close_button": {
+        "type": "button",
+        "position": [
+          2,
+          2
+        ],
+        "scale": [
+          8,
+          2
+        ],
+        "button": {
+          "title": "ui.button.close",
+          "action": "actions:close"
+        }
+      }
+    }
+  }
+}

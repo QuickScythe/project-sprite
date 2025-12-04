@@ -32,23 +32,25 @@ public class MouseKeyboardInputProvider implements InputProvider {
         for (InputAction a : InputAction.values()) previous.put(a, current.get(a));
 
         // Recompute current state from GDX
-        current.put(InputAction.Primary, Gdx.input.isButtonPressed(Input.Buttons.LEFT));
-        current.put(InputAction.Secondary, Gdx.input.isButtonPressed(Input.Buttons.RIGHT));
+        current.put(InputAction.PRIMARY, Gdx.input.isButtonPressed(Input.Buttons.LEFT));
+        current.put(InputAction.SECONDARY, Gdx.input.isButtonPressed(Input.Buttons.RIGHT));
 
         boolean submit = Gdx.input.isKeyPressed(Input.Keys.ENTER) || Gdx.input.isKeyPressed(Input.Keys.SPACE);
-        current.put(InputAction.Submit, submit);
+        current.put(InputAction.SUBMIT, submit);
 
         boolean cancel = Gdx.input.isKeyPressed(Input.Keys.ESCAPE) || Gdx.input.isKeyPressed(Input.Keys.BACKSPACE);
-        current.put(InputAction.Cancel, cancel);
+        current.put(InputAction.CANCEL, cancel);
 
         boolean up = Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP);
         boolean down = Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN);
         boolean left = Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT);
         boolean right = Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT);
-        current.put(InputAction.MoveUp, up);
-        current.put(InputAction.MoveDown, down);
-        current.put(InputAction.MoveLeft, left);
-        current.put(InputAction.MoveRight, right);
+        current.put(InputAction.MOVE_UP, up);
+        current.put(InputAction.MOVE_DOWN, down);
+        current.put(InputAction.MOVE_LEFT, left);
+        current.put(InputAction.MOVE_RIGHT, right);
+
+        current.put(InputAction.INVENTORY, Gdx.input.isKeyPressed(Input.Keys.E));
     }
 
     @Override

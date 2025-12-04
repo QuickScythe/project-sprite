@@ -6,15 +6,15 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.sprite.AudioChannel;
-import com.sprite.Sounds;
 import com.sprite.data.utils.Utils;
+import com.sprite.data.utils.audio.AudioChannel;
+import com.sprite.data.utils.audio.Sounds;
 import com.sprite.input.InputSystem;
 import com.sprite.input.VirtualCursor;
 import com.sprite.render.RenderPipeline;
 import com.sprite.render.camera.GameCamera;
 import com.sprite.render.ui.UI;
-import com.sprite.render.ui.inventory.Dialog;
+import com.sprite.render.ui.dialog.Dialog;
 import com.sprite.render.ui.inventory.Inventory;
 import com.sprite.resource.Resource;
 import com.sprite.resource.ui.DialogUI;
@@ -103,10 +103,6 @@ public abstract class GameScreen implements Screen {
         VirtualCursor cursor = InputSystem.i().cursor();
         cursor.draw(this);
         sprite().end();
-
-
-
-//        ui().actAndDraw(delta);
     }
 
     public RenderPipeline pipeline() {
@@ -144,23 +140,24 @@ public abstract class GameScreen implements Screen {
             for (int i = 1; i <= uis.size(); i++) {
                 if (uis.get(i) != null && uis.get(i).open()) uis.get(i).draw(GameScreen.this);
             }
+            if (camera().focus() != null && camera().focus().inventory().open())
+                camera().focus().inventory().draw(GameScreen.this);
         }
+
         public void debug() {
             for (int i = 1; i <= uis.size(); i++) {
                 if (uis.get(i) != null) uis.get(i).debug(GameScreen.this);
             }
         }
 
-        public void addFirst(UI<? extends UIType> ui) {
-            final int firstSize = uis.size();
-            for (int i = firstSize; i > 0; i--) {
-                uis.put(i + 1, uis.get(i));
-            }
-            uis.put(1, ui);
+        private void add(UI<? extends UIType> ui) {
+            uis.put(uis.size() + 1, ui);
         }
 
-        public void add(UI<? extends UIType> ui) {
-            uis.put(uis.size() + 1, ui);
+        public void open(UI<? extends UIType> ui) {
+            if (uis.containsKey(uis.size())) uis.get(uis.size()).open(false);
+            add(ui);
+            ui.open(true);
         }
 
         public void remove(int index) {
@@ -180,14 +177,16 @@ public abstract class GameScreen implements Screen {
         }
 
         public boolean isOpen() {
-            for(UI<? extends UIType> open : uis.values())
-                if(open.open()) return true;
+            for (UI<? extends UIType> open : uis.values())
+                if (open.open()) return true;
             return false;
         }
 
         public void close() {
-            for(UI<? extends UIType> open : uis.values())
-                open.open(false);
+            uis.get(uis.size() ).open(false);
+            if (uis.containsKey(uis.size() - 1)) uis.get(uis.size() - 1).open(true);
+            uis.remove(uis.size());
+
         }
     }
 }

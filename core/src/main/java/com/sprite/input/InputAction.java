@@ -6,13 +6,14 @@ package com.sprite.input;
  * without changing UI or game logic.
  */
 public enum InputAction {
-    Primary,        // e.g., left click, A/Cross
-    Secondary,      // e.g., right click, B/Circle
-    Submit,         // e.g., Enter/Space, Start
-    Cancel,         // e.g., Escape, Back
+    PRIMARY,        // e.g., left click, A/Cross
+    SECONDARY,      // e.g., right click, B/Circle
+    SUBMIT,         // e.g., Enter/Space, Start
+    CANCEL,         // e.g., Escape, Back
 
-    MoveUp,
-    MoveDown,
-    MoveLeft,
-    MoveRight
+    MOVE_UP,
+    MOVE_DOWN,
+    MOVE_LEFT,
+    MOVE_RIGHT,
+    INVENTORY
 }

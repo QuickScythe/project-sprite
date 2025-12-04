@@ -47,10 +47,10 @@
         "button": {
           "title": "ui.button.options",
           "action": {
-            "method": "log",
+            "method": "open",
             "arguments": [
               {
-                "value": "Options Clicked."
+                "value": "ui:options"
               }
             ]
           }
@@ -114,24 +114,6 @@
         "button": {
           "title": "ui.button.quit",
           "action": "actions:quit"
-        }
-      },
-      "volume_slider": {
-        "type": "slider",
-        "position": [
-          2,
-          1
-        ],
-        "scale": [
-          8,
-          2
-        ],
-        "slider": {
-          "label": "ui.volume.slider",
-          "min": 0,
-          "max": 100,
-          "value": "${settings:volume_master|75}",
-          "step": 1
         }
       }
     }

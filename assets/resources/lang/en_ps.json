@@ -4,9 +4,14 @@
   "game.title": "Project Sprite",
   "ui.button.play": "ARRGG!!",
   "ui.button.options": "Ah'jus da sails!",
+  "ui.options.title": "Ah'jus Ye Sails!",
   "ui.button.quit": "Walk ye plank",
+  "ui.button.close": "Back from w're ye came!",
   "ui.button.en": "English",
   "ui.button.ps": "Pirate",
-  "ui.volume.slider": "Shanties: [0]%",
+  "ui.volume.slider_master": "Noyse: [0]%",
+  "ui.volume.slider_music": "Shanties: [0]%",
+  "ui.volume.slider_sfx": "Canon fier!: [0]%",
+  "ui.volume.slider_ui": "Clics 'an whi'sls: [0]%",
   "ui.slider.value": "Value: [0]"
 }

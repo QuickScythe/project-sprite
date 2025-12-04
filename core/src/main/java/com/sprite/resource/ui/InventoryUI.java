@@ -1,14 +1,12 @@
 package com.sprite.resource.ui;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.sprite.data.utils.Utils;
 import com.sprite.render.screen.GameScreen;
-import com.sprite.resource.texture.GameSprite;
 import com.sprite.input.InputAction;
 import com.sprite.input.InputSystem;
 import org.json.JSONArray;
@@ -136,7 +134,7 @@ public class InventoryUI extends UIType {
      */
     public boolean isLeftClickJustPressedInsideGrid(GameScreen screen) {
         // Use high-level input action so controllers can map to Primary
-        if (!InputSystem.i().isActionJustPressed(InputAction.Primary)) return false;
+        if (!InputSystem.i().isActionJustPressed(InputAction.PRIMARY)) return false;
         return getHoveredIndex(screen) != -1;
     }
 
@@ -154,7 +152,7 @@ public class InventoryUI extends UIType {
      */
     public int getClickedIndex(GameScreen screen) {
         // Primary action (mouse left or controller confirm)
-        if (!InputSystem.i().isActionJustPressed(InputAction.Primary)) return -1;
+        if (!InputSystem.i().isActionJustPressed(InputAction.PRIMARY)) return -1;
         return getHoveredVisibleIndex(screen);
     }
 

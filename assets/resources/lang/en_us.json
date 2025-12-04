@@ -5,8 +5,13 @@
   "ui.button.play": "Play",
   "ui.button.options": "Options",
   "ui.button.quit": "Exit",
+  "ui.button.close": "Close",
+  "ui.options.title": "Options",
   "ui.button.en": "English",
   "ui.button.ps": "Pirate",
   "ui.slider.value": "Value: %value%",
-  "ui.volume.slider": "Volume: [0]%"
+  "ui.volume.slider_master": "Master: [0]%",
+  "ui.volume.slider_music": "Music: [0]%",
+  "ui.volume.slider_sfx": "Effects: [0]%",
+  "ui.volume.slider_ui": "UI: [0]%"
 }

@@ -24,28 +24,15 @@ public class UIEditor {
         @Override
         public void create() {
             UI<?> ui = ui().build(Utils.resources().USER_INTERFACES.load("ui:main_menu"));
-            ui.open(true);
-            ui().addFirst(ui);
+            ui().open(ui);
         }
 
 
         @Override
         public void render(float delta) {
-            if (Gdx.input.isKeyJustPressed(Input.Keys.L)) {
-                ui().addFirst(ui().build(Utils.resources().USER_INTERFACES.load("ui:furnace")));
-            }
             if (Gdx.input.isKeyJustPressed(Input.Keys.K)) {
-                ui().add(ui().build(Utils.resources().USER_INTERFACES.load("ui:furnace")));
+                ui().open(ui().build(Utils.resources().USER_INTERFACES.load("ui:furnace")));
             }
-            if (Gdx.input.isKeyJustPressed(Input.Keys.J)) {
-                ui().clear();
-                ui().add(ui().build(Utils.resources().USER_INTERFACES.load("ui:player/inventory")));
-//                buildUI(Utils.resources().USER_INTERFACES.load("ui:main_menu"));
-            }
-            if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
-                ui().remove(ui().size());
-            }
-            // Ensure input system is updated when using this editor screen
             InputSystem.i().update(delta);
             ScreenUtils.clear(Color.BLACK);
 
