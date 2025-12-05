@@ -1,0 +1,5 @@
+{
+  "texture": "textures:block/stone",
+  "hardness": 1.0,
+  "name": "block.stone.name"
+}

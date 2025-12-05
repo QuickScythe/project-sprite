@@ -1,0 +1,8 @@
+{
+  "type": "flat_bottom",
+  "palette": {
+    "1": "tiles:grass",
+    "2": "tiles:dirt",
+    "3": "tiles:stone"
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "texture": "textures:block/grass",
+  "hardness": 1.0,
+  "name": "block.grass.name"
+}

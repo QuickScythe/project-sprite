@@ -1,0 +1,15 @@
+{
+  "type": "smooth_hills",
+  "amplitude": 6.0,
+  "verticalOffset": -4.0,
+  "seed": 1337,
+  "octaves": 4,
+  "baseFrequency": 0.020833333333333332,
+  "lacunarity": 2.0,
+  "persistence": 0.5,
+  "palette": {
+    "1": "tiles:grass",
+    "2": "tiles:dirt",
+    "3": "tiles:stone"
+  }
+}

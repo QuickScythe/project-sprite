@@ -1,0 +1,5 @@
+{
+  "texture": "textures:block/dirt",
+  "hardness": 1.0,
+  "name": "block.dirt.name"
+}
