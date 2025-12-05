@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.sprite.data.annotations.Nullable;
 import com.sprite.data.TranslatableString;
+import com.sprite.input.InputAction;
+import com.sprite.input.InputSystem;
 import com.sprite.render.screen.GameScreen;
 import com.sprite.render.ui.UI;
 import com.sprite.render.ui.inventory.Inventory;
@@ -87,6 +89,10 @@ public class Entity {
     }
 
     public void render(GameScreen screen) {
+        if(controller.input().id().equalsIgnoreCase("input:player")) {
+            handlePlayerInput(screen);
+        }
+
         director.render(screen.sprite(), this, position.x, position.y, width, height);
 
         Vector3 prevNode = null;
@@ -107,6 +113,29 @@ public class Entity {
         screen.shape().end();
         screen.sprite().begin();
 
+    }
+
+    private void handlePlayerInput(GameScreen screen) {
+        if (!screen.ui().isOpen()) {
+            boolean left = InputSystem.i().isActionPressed(InputAction.MOVE_LEFT);
+            boolean right = InputSystem.i().isActionPressed(InputAction.MOVE_RIGHT);
+            boolean jumpJustPressed = InputSystem.i().isActionJustPressed(InputAction.JUMP);
+
+            // Horizontal movement: A/D (or Left/Right)
+            float dirX = 0f;
+            if (left) dirX -= 1f;
+            if (right) dirX += 1f;
+
+            // Apply horizontal velocity based on the entity's speed while preserving current vertical velocity
+            float targetVx = (dirX * 1) * speed();
+            setVelocity(targetVx, getVelY());
+
+            // Jump on W (or Up) just pressed, if the entity can jump
+            if (jumpJustPressed && onGround()) {
+                // Basic jump impulse; keep consistent with existing debug usage (500)
+                jump(15f);
+            }
+        }
     }
 
 
@@ -147,11 +176,11 @@ public class Entity {
 
         physics(world, delta);
 
-        if (pathfinder() != null) {
-            path = pathfinder.path(world, this);
-
-            return;
-        }
+//        if (pathfinder() != null) {
+//            path = pathfinder.path(world, this);
+//
+//            return;
+//        }
     }
 
     private void physics(World world, float delta) {
@@ -161,27 +190,110 @@ public class Entity {
         body.ay += world.gravity();
 
         // Integrate velocity
-        body.vx += body.ax * delta;
-        body.vy += body.ay * delta;
+        // Remove delta-time scaling: advance one fixed step per frame
+        body.vx += body.ax;
+        body.vy += body.ay;
 
         // Damping (air drag) - apply primarily to horizontal motion
         body.vx *= world.linearDamping();
         // Avoid damping vertical velocity to keep gravity and jumps responsive
 
-        // Integrate position
-        body.x += body.vx * delta;
-        body.y += body.vy * delta;
-
-        // Ground collision with simple plane at y = worldFloorY
+        // Integrate and resolve collisions against TileWorld
         body.onGround = false;
-        if (body.y < world.floor()) {
-            body.y = world.floor();
-            if (body.vy < 0) {
-                body.vy = -body.vy * world.restitution();
+
+        int ts = world.tileSize();
+
+        // Move along X and resolve
+        float dx = body.vx;
+        if (dx != 0f) {
+            float newX = body.x + dx;
+            if (!collides(world, newX, body.y, body.width, body.height)) {
+                body.x = newX;
+            } else {
+                // Snap to tile boundary depending on direction
+                if (dx > 0) {
+                    // moving right: clamp to left edge of blocking tile
+                    int maxTileY = (int) Math.floor((body.y + body.height - 0.001f) / ts);
+                    int minTileY = (int) Math.floor((body.y + 0.001f) / ts);
+                    int tileX = (int) Math.floor((body.x + body.width - 0.001f) / ts);
+                    // scan tiles along vertical span to find first solid just to the right
+                    int stopTileX = tileX;
+                    for (int ty = minTileY; ty <= maxTileY; ty++) {
+                        int tx = (int) Math.floor((body.x + body.width + dx) / ts);
+                        if (world.isSolid(world.getTileId(tx, ty))) {
+                            stopTileX = tx;
+                            break;
+                        }
+                    }
+                    body.x = stopTileX * ts - body.width;
+                } else {
+                    // moving left: clamp to right edge of blocking tile
+                    int maxTileY = (int) Math.floor((body.y + body.height - 0.001f) / ts);
+                    int minTileY = (int) Math.floor((body.y + 0.001f) / ts);
+                    int tileX = (int) Math.floor((body.x + 0.001f) / ts);
+                    int stopTileX = tileX;
+                    for (int ty = minTileY; ty <= maxTileY; ty++) {
+                        int tx = (int) Math.floor((body.x + dx) / ts);
+                        if (world.isSolid(world.getTileId(tx, ty))) {
+                            stopTileX = tx;
+                            break;
+                        }
+                    }
+                    body.x = (stopTileX + 1) * ts;
+                }
+                body.vx = 0f;
             }
-            // When on ground, apply additional friction and zero tiny vertical velocity
-            if (Math.abs(body.vy) < 0.01f) body.vy = 0f;
-            body.onGround = true;
+        }
+
+        // Move along Y and resolve (sets onGround when landing)
+        float dy = body.vy;
+        if (dy != 0f) {
+            float newY = body.y + dy;
+            if (!collides(world, body.x, newY, body.width, body.height)) {
+                body.y = newY;
+            } else {
+                if (dy > 0) {
+                    // moving up: hit ceiling
+                    int maxTileX = (int) Math.floor((body.x + body.width - 0.001f) / ts);
+                    int minTileX = (int) Math.floor((body.x + 0.001f) / ts);
+                    int tileY = (int) Math.floor((body.y + body.height - 0.001f) / ts);
+                    int stopTileY = tileY;
+                    for (int tx = minTileX; tx <= maxTileX; tx++) {
+                        int ty = (int) Math.floor((body.y + body.height + dy) / ts);
+                        if (world.isSolid(world.getTileId(tx, ty))) {
+                            stopTileY = ty;
+                            break;
+                        }
+                    }
+                    body.y = stopTileY * ts - body.height;
+                    body.vy = 0f;
+                } else {
+                    // moving down: land on ground
+                    int maxTileX = (int) Math.floor((body.x + body.width - 0.001f) / ts);
+                    int minTileX = (int) Math.floor((body.x + 0.001f) / ts);
+                    int tileY = (int) Math.floor((body.y + 0.001f) / ts);
+                    int stopTileY = tileY;
+                    for (int tx = minTileX; tx <= maxTileX; tx++) {
+                        int ty = (int) Math.floor((body.y + dy) / ts);
+                        if (world.isSolid(world.getTileId(tx, ty))) {
+                            stopTileY = ty;
+                            break;
+                        }
+                    }
+                    body.y = (stopTileY + 1) * ts;
+                    if (body.vy < 0) {
+                        body.vy = -body.vy * world.restitution();
+                        if (Math.abs(body.vy) < 0.01f) body.vy = 0f;
+                    } else {
+                        body.vy = 0f;
+                    }
+                    body.onGround = true;
+                }
+            }
+        }
+
+        // Apply ground friction if grounded after Y resolution
+        if (body.onGround) {
             body.vx *= world.groundFriction();
         }
 
@@ -191,6 +303,22 @@ public class Entity {
 
         // Sync entity position
         position().set(body.x, body.y, 0);
+    }
+
+    private static boolean collides(World world, float x, float y, float w, float h) {
+        // Determine tile range overlapped by AABB
+        int ts = world.tileSize();
+
+        int minTx = (int) Math.floor((x + 0.001f) / ts);
+        int maxTx = (int) Math.floor((x + w - 0.001f) / ts);
+        int minTy = (int) Math.floor((y + 0.001f) / ts);
+        int maxTy = (int) Math.floor((y + h - 0.001f) / ts);
+        for (int tx = minTx; tx <= maxTx; tx++) {
+            for (int ty = minTy; ty <= maxTy; ty++) {
+                if (world.isSolid(world.getTileId(tx, ty))) return true;
+            }
+        }
+        return false;
     }
 
     public int health() {
@@ -276,21 +404,20 @@ public class Entity {
 
     public class Pathfinder {
 
-        private static final float CELL_SIZE = 16f;
+        // Pathfinding uses the world's tile size for cells so it aligns with TileWorld
         private static final int MAX_EXPANSIONS = 5000; // safety cap to avoid runaway search
 
         public final List<EntityType> targets;
         private Path lastPath = null;
         private float lastTargetX = Float.NaN;
         private float lastTargetY = Float.NaN;
-        private int maxJumpCells = Integer.MAX_VALUE;
+        // Maximum jump height in world units; converted to tiles when generating neighbors
+        private float maxJumpHeightWorld = Float.POSITIVE_INFINITY;
 
         public Pathfinder(List<EntityType> targets, float maxJumpHeight) {
             this.targets = targets;
-            if (maxJumpHeight <= 0 || Float.isInfinite(maxJumpHeight)) {
-                this.maxJumpCells = Integer.MAX_VALUE;
-            } else {
-                this.maxJumpCells = Math.max(0, Math.round(maxJumpHeight / CELL_SIZE));
+            if (maxJumpHeight > 0 && !Float.isInfinite(maxJumpHeight)) {
+                this.maxJumpHeightWorld = maxJumpHeight;
             }
         }
 
@@ -308,14 +435,15 @@ public class Entity {
             if (target == null) return null;
 
             // If target hasn't moved significantly and we have a path, reuse it
-            if (lastPath != null && Math.hypot(target.position().x - lastTargetX, target.position().y - lastTargetY) < CELL_SIZE * 0.25f) {
+            float cellSize = world.tileSize();
+            if (lastPath != null && Math.hypot(target.position().x - lastTargetX, target.position().y - lastTargetY) < cellSize * 0.25f) {
                 return lastPath;
             }
 
             // Compute new path using A*
             Vector3 start = entity.position();
             Vector3 goal = target.position();
-            Path computed = aStar(start.x, start.y, goal.x, goal.y);
+            Path computed = aStar(world, entity, start.x, start.y, goal.x, goal.y);
             if (computed == null || computed.isEmpty()) {
                 // Fallback to direct line path
                 Path fallback = new Path();
@@ -346,11 +474,12 @@ public class Entity {
 
         }
 
-        private Path aStar(float sx, float sy, float gx, float gy) {
-            int sxi = Math.round(sx / CELL_SIZE);
-            int syi = Math.round(sy / CELL_SIZE);
-            int gxi = Math.round(gx / CELL_SIZE);
-            int gyi = Math.round(gy / CELL_SIZE);
+        private Path aStar(World world, Entity entity, float sx, float sy, float gx, float gy) {
+            final int ts = world.tileSize();
+            int sxi = (int) Math.floor(sx / ts);
+            int syi = (int) Math.floor(sy / ts);
+            int gxi = (int) Math.floor(gx / ts);
+            int gyi = (int) Math.floor(gy / ts);
             final int startYCell = syi;
 
             Node start = new Node(sxi, syi, 0, 0, null);
@@ -368,34 +497,22 @@ public class Entity {
             while (!open.isEmpty() && expansions < MAX_EXPANSIONS) {
                 Node current = open.poll();
                 if (current.x == goal.x && current.y == goal.y) {
-                    return reconstruct(current);
+                    return reconstruct(world, current);
                 }
                 if (!closed.add(current)) continue;
                 expansions++;
 
-                // 8-directional neighbors
-                for (int dx = -1; dx <= 1; dx++) {
-                    for (int dy = -1; dy <= 1; dy++) {
-                        if (dx == 0 && dy == 0) continue;
-                        int nx = current.x + dx;
-                        int ny = current.y + dy;
-
-                        // Enforce max jump height relative to start Y
-                        if (ny - startYCell > maxJumpCells) continue;
-
-                        Node neighbor = new Node(nx, ny, 0, 0, null);
-                        if (closed.contains(neighbor)) continue;
-
-                        float stepCost = (dx == 0 || dy == 0) ? 1f : 1.41421356f; // straight vs diagonal
-                        float tentativeG = bestG.get(current) + stepCost;
-                        Float knownG = bestG.get(neighbor);
-                        if (knownG == null || tentativeG < knownG) {
-                            neighbor.parent = current;
-                            neighbor.g = tentativeG;
-                            neighbor.f = tentativeG + heuristic(neighbor, goal);
-                            bestG.put(neighbor, tentativeG);
-                            open.add(neighbor);
-                        }
+                // Generate neighbors using TileWorld solidity with gravity and jump capabilities
+                for (Node neighbor : generateNeighbors(world, entity, current, startYCell)) {
+                    if (closed.contains(neighbor)) continue;
+                    float tentativeG = bestG.get(current) + neighborCost(current, neighbor);
+                    Float knownG = bestG.get(neighbor);
+                    if (knownG == null || tentativeG < knownG) {
+                        neighbor.parent = current;
+                        neighbor.g = tentativeG;
+                        neighbor.f = tentativeG + heuristic(neighbor, goal);
+                        bestG.put(neighbor, tentativeG);
+                        open.add(neighbor);
                     }
                 }
             }
@@ -403,17 +520,18 @@ public class Entity {
         }
 
         private float heuristic(Node a, Node b) {
-            // Euclidean distance
-            int dx = a.x - b.x;
-            int dy = a.y - b.y;
-            return (float) Math.sqrt(dx * dx + dy * dy);
+            // Manhattan for grid with gravity works well
+            int dx = Math.abs(a.x - b.x);
+            int dy = Math.abs(a.y - b.y);
+            return dx + dy;
         }
 
-        private Path reconstruct(Node end) {
+        private Path reconstruct(World world, Node end) {
+            final int ts = world.tileSize();
             ArrayList<float[]> rev = new ArrayList<>();
             Node n = end;
             while (n != null) {
-                rev.add(new float[]{n.x * CELL_SIZE, n.y * CELL_SIZE});
+                rev.add(new float[]{n.x * ts, n.y * ts});
                 n = n.parent;
             }
             Path p = new Path();
@@ -422,6 +540,125 @@ public class Entity {
                 p.addWaypoint(xy[0], xy[1]);
             }
             return p;
+        }
+
+        private Iterable<Node> generateNeighbors(World world, Entity entity, Node current, int startYCell) {
+            java.util.ArrayList<Node> result = new java.util.ArrayList<>(8);
+            final int ts = world.tileSize();
+
+            // Helper lambdas over tile coords
+            java.util.function.BiFunction<Integer, Integer, Boolean> standable = (tx, ty) -> isStandableAt(world, entity, tx, ty);
+            java.util.function.BiFunction<Integer, Integer, Boolean> fits = (tx, ty) -> fitsAt(world, entity, tx, ty);
+
+            int cx = current.x;
+            int cy = current.y;
+
+            // Ensure current is valid; if not on ground, drop to ground directly
+            if (!standable.apply(cx, cy)) {
+                int landY = findFallLandingY(world, entity, cx, cy, 8);
+                if (landY != Integer.MIN_VALUE) {
+                    result.add(new Node(cx, landY, 0, 0, current));
+                }
+                return result;
+            }
+
+            // Walk left/right on same level if destination standable
+            int nx = cx - 1;
+            if (standable.apply(nx, cy)) result.add(new Node(nx, cy, 0, 0, current));
+            else {
+                // If stepping into air, allow falling to first landing at that x
+                if (fits.apply(nx, cy)) {
+                    int land = findFallLandingY(world, entity, nx, cy, 8);
+                    if (land != Integer.MIN_VALUE) result.add(new Node(nx, land, 0, 0, current));
+                }
+            }
+            nx = cx + 1;
+            if (standable.apply(nx, cy)) result.add(new Node(nx, cy, 0, 0, current));
+            else {
+                if (fits.apply(nx, cy)) {
+                    int land = findFallLandingY(world, entity, nx, cy, 8);
+                    if (land != Integer.MIN_VALUE) result.add(new Node(nx, land, 0, 0, current));
+                }
+            }
+
+            // Step up and simple jump up: try up to maxJumpCells tiles higher, limited breadth (±1 x)
+            int maxUpTiles = (int) Math.floor(maxJumpHeightWorld / ts);
+            if (maxUpTiles <= 0 || maxUpTiles > 8) maxUpTiles = 3; // default conservative cap
+            int maxUp = Math.min(maxUpTiles, 3); // keep conservative for minimal implementation
+            for (int j = 1; j <= maxUp; j++) {
+                // vertical clearance at current x
+                if (fits.apply(cx, cy + j) && standable.apply(cx, cy + j)) {
+                    result.add(new Node(cx, cy + j, 0, 0, current));
+                    break;
+                }
+                // adjacent x
+                if (fits.apply(cx - 1, cy + j) && standable.apply(cx - 1, cy + j)) {
+                    result.add(new Node(cx - 1, cy + j, 0, 0, current));
+                    break;
+                }
+                if (fits.apply(cx + 1, cy + j) && standable.apply(cx + 1, cy + j)) {
+                    result.add(new Node(cx + 1, cy + j, 0, 0, current));
+                    break;
+                }
+            }
+
+            // Allow small step down (descending stairs)
+            if (standable.apply(cx, cy - 1)) result.add(new Node(cx, cy - 1, 0, 0, current));
+
+            return result;
+        }
+
+        private int findFallLandingY(World world, Entity entity, int tx, int startTy, int maxScan) {
+            // Scan downward until we find first standable position
+            for (int dy = 1; dy <= maxScan; dy++) {
+                int ty = startTy - dy;
+                if (isStandableAt(world, entity, tx, ty)) return ty;
+                // if we've hit solid where body overlaps, stop
+                if (!fitsAt(world, entity, tx, ty)) return Integer.MIN_VALUE;
+            }
+            return Integer.MIN_VALUE;
+        }
+
+        private boolean isStandableAt(World world, Entity entity, int tx, int ty) {
+            if (!fitsAt(world, entity, tx, ty)) return false;
+            // Require solid ground directly below any part of the entity's feet
+            final int ts = world.tileSize();
+            float wx = tx * ts;
+            float wy = (ty * ts) - 1; // just below feet
+            // Check across the entity's width
+            float ex = wx + entity.width();
+            for (float x = wx; x < ex; x += Math.min(ts, entity.width())) {
+                if (world.isSolidAtWorld(x + 0.5f, wy)) return true;
+            }
+            // Also check the far edge
+            if (world.isSolidAtWorld(ex - 0.5f, wy)) return true;
+            return false;
+        }
+
+        private boolean fitsAt(World world, Entity entity, int tx, int ty) {
+            final int ts = world.tileSize();
+            float wx = tx * ts;
+            float wy = ty * ts;
+            // AABB vs solid tiles using sampling at tile grid
+            int minTx = (int) Math.floor((wx + 0.001f) / ts);
+            int maxTx = (int) Math.floor((wx + entity.width() - 0.001f) / ts);
+            int minTy = (int) Math.floor((wy + 0.001f) / ts);
+            int maxTy = (int) Math.floor((wy + entity.height() - 0.001f) / ts);
+            for (int ix = minTx; ix <= maxTx; ix++) {
+                for (int iy = minTy; iy <= maxTy; iy++) {
+                    if (world.isSolid(world.getTileId(ix, iy))) return false;
+                }
+            }
+            return true;
+        }
+
+        private float neighborCost(Node a, Node b) {
+            // Base cost: horizontal/vertical move is 1 per tile; vertical up weighs slightly more
+            int dx = Math.abs(a.x - b.x);
+            int dy = Math.abs(a.y - b.y);
+            float cost = dx + dy;
+            if (b.y > a.y) cost += 0.25f * (b.y - a.y); // discourage excessive jumping
+            return cost;
         }
 
         public void clear() {

@@ -3,7 +3,7 @@ package com.sprite.resource.animations;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.sprite.resource.Resource;
 import com.sprite.resource.ResourceMeta;
-import com.sprite.resource.models.Model;
+import com.sprite.game.world.entities.Entity;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -62,7 +62,7 @@ public class Animation {
 
     }
 
-    public TextureRegion frame(Model model) {
+    public TextureRegion frame(Entity entity) {
         if (new Date().getTime() - update >= speed * 1) {
             update = new Date().getTime();
             frame = frame + 1;
@@ -70,6 +70,8 @@ public class Animation {
                 frame = 0;
             }
         }
+        // Use the entity's model to fetch the proper sprite frame
+        var model = entity.model;
         return new TextureRegion(model.texture.sprite, frame * model.width, index * model.height, model.width, model.height);
 
 

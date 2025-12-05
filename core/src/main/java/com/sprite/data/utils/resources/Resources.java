@@ -7,6 +7,8 @@ import com.badlogic.gdx.files.FileHandle;
 import com.sprite.data.registries.Registries;
 import com.sprite.data.registries.Registry;
 import com.sprite.data.utils.Utils;
+import com.sprite.game.world.gen.ChunkGenerator;
+import com.sprite.game.world.gen.ChunkGeneratorFactory;
 import com.sprite.resource.Resource;
 import com.sprite.resource.ResourceMeta;
 import com.sprite.resource.animations.Animation;
@@ -102,12 +104,18 @@ public class Resources {
     public final Resource.RegistryAccess<LootTable> LOOT;
 
     /**
+     * Registry access wrapper for ChunkGenerators
+     */
+    public final Resource.RegistryAccess<ChunkGenerator> CHUNK_GENERATORS;
+
+    /**
      * Creates a Resources manager, scanning both internal (classpath) and external (local) assets
      * under the provided root folder.
      *
      * @param rootFolder the root assets folder (e.g., "resources")
      */
     public Resources(String rootFolder) {
+        CHUNK_GENERATORS = registerRegistry("chunk_generators", (resource -> ChunkGeneratorFactory.create(((ResourceMeta.Json)resource.data.data()).get())));
         LOOT = new Resource.RegistryAccess<>(null) {
             @Override
             public String key() {

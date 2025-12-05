@@ -15,5 +15,6 @@ public enum InputAction {
     MOVE_DOWN,
     MOVE_LEFT,
     MOVE_RIGHT,
+    JUMP,
     INVENTORY
 }

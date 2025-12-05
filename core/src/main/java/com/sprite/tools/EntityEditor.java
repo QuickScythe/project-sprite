@@ -98,7 +98,7 @@ public class EntityEditor {
 //            float x = 0;
 //            for(EntityType type : Utils.resources().ENTITIES.all()){
 //
-            sprite().draw(type.model.animations[1].frame(type.model), (camera().viewportWidth/2)-(type.width/2), (camera().viewportHeight/2)-(type.width/2), type.width, type.height);
+//            sprite().draw(type.model.animations[1].frame(type.model), (camera().viewportWidth/2)-(type.width/2), (camera().viewportHeight/2)-(type.width/2), type.width, type.height);
 //                x = x + type.width;
 
             font().setColor(Color.WHITE);

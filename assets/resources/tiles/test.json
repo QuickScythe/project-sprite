@@ -1,3 +1,5 @@
 {
-  "texture": "textures:arrow"
+  "texture": "textures:arrow",
+  "hardness": 1.0,
+  "name": "block.test.name"
 }
