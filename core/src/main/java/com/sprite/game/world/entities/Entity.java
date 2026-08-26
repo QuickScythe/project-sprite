@@ -1,23 +1,24 @@
 package com.sprite.game.world.entities;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.sprite.data.annotations.Nullable;
 import com.sprite.data.TranslatableString;
+import com.sprite.data.utils.resources.Texts;
 import com.sprite.input.InputAction;
 import com.sprite.input.InputSystem;
 import com.sprite.render.screen.GameScreen;
-import com.sprite.render.ui.UI;
 import com.sprite.render.ui.inventory.Inventory;
 import com.sprite.resource.animations.Animation;
 import com.sprite.resource.animations.AnimationDirector;
 import com.sprite.resource.controllers.Controller;
+import com.sprite.resource.entities.CollisionData;
 import com.sprite.resource.entities.EntityType;
 import com.sprite.resource.models.Model;
 import com.sprite.data.utils.Utils;
 import com.sprite.game.world.World;
-import com.sprite.resource.ui.UIType;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -40,9 +41,10 @@ public class Entity {
     private Pathfinder.Path path = null;
     private Body body;
     private final Inventory inventory;
+    private final UUID uuid;
 
 
-    public Entity(EntityType type, float x, float y) {
+    public Entity(EntityType type, float x, float y, List<UUID> takenUuids) {
         this.type = type;
         this.model = type.model.clone();
         this.health = type.health;
@@ -74,6 +76,11 @@ public class Entity {
         for (Animation animation : model.animations) {
             this.director.animations.register(animation.name, animation);
         }
+        UUID tempUUID = UUID.randomUUID();
+        while (takenUuids.contains(tempUUID)) {
+            tempUUID = UUID.randomUUID();
+        }
+        this.uuid = tempUUID;
     }
 
     public void speed(float speed) {
@@ -210,37 +217,16 @@ public class Entity {
             if (!collides(world, newX, body.y, body.width, body.height)) {
                 body.x = newX;
             } else {
-                // Snap to tile boundary depending on direction
-                if (dx > 0) {
-                    // moving right: clamp to left edge of blocking tile
-                    int maxTileY = (int) Math.floor((body.y + body.height - 0.001f) / ts);
-                    int minTileY = (int) Math.floor((body.y + 0.001f) / ts);
-                    int tileX = (int) Math.floor((body.x + body.width - 0.001f) / ts);
-                    // scan tiles along vertical span to find first solid just to the right
-                    int stopTileX = tileX;
-                    for (int ty = minTileY; ty <= maxTileY; ty++) {
-                        int tx = (int) Math.floor((body.x + body.width + dx) / ts);
-                        if (world.isSolid(world.getTileId(tx, ty))) {
-                            stopTileX = tx;
-                            break;
-                        }
+                // Perform a binary search or iterative approach to find the closest non-colliding position
+                float step = dx;
+                float currentX = body.x;
+                for (int i = 0; i < 8; i++) { // 8 iterations for sub-pixel precision
+                    step /= 2f;
+                    if (!collides(world, currentX + step, body.y, body.width, body.height)) {
+                        currentX += step;
                     }
-                    body.x = stopTileX * ts - body.width;
-                } else {
-                    // moving left: clamp to right edge of blocking tile
-                    int maxTileY = (int) Math.floor((body.y + body.height - 0.001f) / ts);
-                    int minTileY = (int) Math.floor((body.y + 0.001f) / ts);
-                    int tileX = (int) Math.floor((body.x + 0.001f) / ts);
-                    int stopTileX = tileX;
-                    for (int ty = minTileY; ty <= maxTileY; ty++) {
-                        int tx = (int) Math.floor((body.x + dx) / ts);
-                        if (world.isSolid(world.getTileId(tx, ty))) {
-                            stopTileX = tx;
-                            break;
-                        }
-                    }
-                    body.x = (stopTileX + 1) * ts;
                 }
+                body.x = currentX;
                 body.vx = 0f;
             }
         }
@@ -252,35 +238,22 @@ public class Entity {
             if (!collides(world, body.x, newY, body.width, body.height)) {
                 body.y = newY;
             } else {
-                if (dy > 0) {
-                    // moving up: hit ceiling
-                    int maxTileX = (int) Math.floor((body.x + body.width - 0.001f) / ts);
-                    int minTileX = (int) Math.floor((body.x + 0.001f) / ts);
-                    int tileY = (int) Math.floor((body.y + body.height - 0.001f) / ts);
-                    int stopTileY = tileY;
-                    for (int tx = minTileX; tx <= maxTileX; tx++) {
-                        int ty = (int) Math.floor((body.y + body.height + dy) / ts);
-                        if (world.isSolid(world.getTileId(tx, ty))) {
-                            stopTileY = ty;
-                            break;
-                        }
+                // Perform a binary search or iterative approach to find the closest non-colliding position
+                float step = dy;
+                float currentY = body.y;
+                for (int i = 0; i < 8; i++) {
+                    step /= 2f;
+                    if (!collides(world, body.x, currentY + step, body.width, body.height)) {
+                        currentY += step;
                     }
-                    body.y = stopTileY * ts - body.height;
+                }
+                body.y = currentY;
+
+                if (dy > 0) {
+                    // hit ceiling
                     body.vy = 0f;
                 } else {
-                    // moving down: land on ground
-                    int maxTileX = (int) Math.floor((body.x + body.width - 0.001f) / ts);
-                    int minTileX = (int) Math.floor((body.x + 0.001f) / ts);
-                    int tileY = (int) Math.floor((body.y + 0.001f) / ts);
-                    int stopTileY = tileY;
-                    for (int tx = minTileX; tx <= maxTileX; tx++) {
-                        int ty = (int) Math.floor((body.y + dy) / ts);
-                        if (world.isSolid(world.getTileId(tx, ty))) {
-                            stopTileY = ty;
-                            break;
-                        }
-                    }
-                    body.y = (stopTileY + 1) * ts;
+                    // land on ground
                     if (body.vy < 0) {
                         body.vy = -body.vy * world.restitution();
                         if (Math.abs(body.vy) < 0.01f) body.vy = 0f;
@@ -305,7 +278,54 @@ public class Entity {
         position().set(body.x, body.y, 0);
     }
 
-    private static boolean collides(World world, float x, float y, float w, float h) {
+    public boolean collides(World world, float x, float y, float w, float h) {
+        Animation.FrameData frameData = director.currentFrameData(this);
+        if (frameData != null) {
+            List<String> collisionKeys = frameData.collisions();
+            if (!collisionKeys.isEmpty()) {
+                boolean facingRight = director.isFacingRight();
+                float scaleX = width / model.width;
+                float scaleY = height / model.height;
+
+                for (String key : collisionKeys) {
+                    CollisionData data = frameData.collisions(key);
+                    for (CollisionData.Part part : data.parts) {
+                        float partX1 = part.from().x * scaleX;
+                        float partX2 = part.to().x * scaleX;
+                        float partY1 = part.from().y * scaleY;
+                        float partY2 = part.to().y * scaleY;
+
+                        float minX = Math.min(partX1, partX2);
+                        float maxX = Math.max(partX1, partX2);
+                        float minY = Math.min(partY1, partY2);
+                        float maxY = Math.max(partY1, partY2);
+
+                        float partW = maxX - minX;
+                        float partH = maxY - minY;
+
+                        float relativeX;
+                        if (facingRight) {
+                            relativeX = minX;
+                        } else {
+                            relativeX = width - maxX;
+                        }
+
+                        float px = x + relativeX;
+                        float py = y + minY;
+
+                        if (checkCollision(world, px, py, partW, partH)) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+        }
+
+        return checkCollision(world, x, y, w, h);
+    }
+
+    private static boolean checkCollision(World world, float x, float y, float w, float h) {
         // Determine tile range overlapped by AABB
         int ts = world.tileSize();
 
@@ -355,6 +375,16 @@ public class Entity {
 
     public Inventory inventory() {
         return inventory;
+    }
+
+    @Override
+    public String toString() {
+
+        return Texts.get(name);
+    }
+
+    public UUID uuid() {
+        return uuid;
     }
 
     public static class Position {
@@ -735,4 +765,6 @@ public class Entity {
         }
 
     }
+
+
 }

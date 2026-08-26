@@ -1,6 +1,8 @@
 package com.sprite.render.screen;
 
 import com.sprite.data.utils.Utils;
+import com.sprite.input.InputAction;
+import com.sprite.input.InputSystem;
 import com.sprite.render.ui.UI;
 import com.sprite.resource.texture.GameSprite;
 
@@ -21,7 +23,15 @@ public class MenuScreen extends GameScreen{
 
     }
 
+    @Override
+    public void draw(float delta) {
 
+    }
+
+    @Override
+    public void debug(float delta) {
+
+    }
 
     @Override
     public void resize(int width, int height) {

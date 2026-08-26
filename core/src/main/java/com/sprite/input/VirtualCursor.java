@@ -3,6 +3,7 @@ package com.sprite.input;
 import com.badlogic.gdx.math.Vector3;
 import com.sprite.data.utils.Utils;
 import com.sprite.game.ItemStack;
+import com.sprite.game.world.entities.Entity;
 import com.sprite.render.screen.GameScreen;
 import com.sprite.render.screen.WorldScreen;
 import com.sprite.resource.texture.GameSprite;
@@ -84,7 +85,10 @@ public class VirtualCursor {
             }
         } else {
             if (screen instanceof WorldScreen worldScreen) {
-                if (Utils.distance(worldScreen.camera().focus().position(), new Vector3(mouse.x, mouse.y, 0)) < 5*worldScreen.world().tileSize()) {
+                Entity focus = worldScreen.camera().focus();
+                Vector3 focusPos = focus.position();
+                Vector3 focusCenter = focusPos.cpy().add(focus.width() / 2f, focus.height() / 2f, 0f);
+                if (Utils.distance(focusCenter, new Vector3(mouse.x, mouse.y, 0)) < 10*worldScreen.world().tileSize()) {
                     if (InputSystem.i().isActionPressed(InputAction.PRIMARY))
                         worldScreen.world().getTileAtWorld(mouse.x, mouse.y).id(0);
                     if (InputSystem.i().isActionPressed(InputAction.SECONDARY))

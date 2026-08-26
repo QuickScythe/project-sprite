@@ -8,6 +8,7 @@ import com.sprite.game.world.entities.Entity;
 import com.sprite.game.world.gen.ChunkGenerator;
 import com.sprite.game.world.gen.ChunkGeneratorFactory;
 import com.sprite.game.world.gen.FlatBottomGenerator;
+import com.sprite.game.world.gen.SmoothRollingHillsGenerator;
 import com.sprite.game.world.tiles.Tile;
 import com.sprite.game.world.tiles.TileChunk;
 import com.sprite.render.camera.GameCamera;
@@ -20,6 +21,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class World {
 
@@ -108,9 +110,13 @@ public class World {
     }
 
     public Entity spawn(EntityType type, int x, int y) {
-        Entity entity = new Entity(type, x, y);
+        Entity entity = new Entity(type, x, y, getUUIDs());
         entities.add(entity);
         return entity;
+    }
+
+    private List<UUID> getUUIDs(){
+        return entities.stream().map(Entity::uuid).collect(Collectors.toList());
     }
 
     /**
@@ -510,8 +516,8 @@ public class World {
 
         String name;
         private long seed;
-        private ChunkGenerator generator = new FlatBottomGenerator();
-        private int tileSize = 128;
+        private ChunkGenerator generator = new SmoothRollingHillsGenerator();
+        private int tileSize = 32;
 
         private float gravity = -0.75f; // units per sec^2 (stronger gravity for snappier feel)
         private float linearDamping = 1; // air drag each step (per-frame factor)

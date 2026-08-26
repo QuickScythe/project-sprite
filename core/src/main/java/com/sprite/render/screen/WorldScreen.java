@@ -3,14 +3,23 @@ package com.sprite.render.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.sprite.data.TranslatableString;
 import com.sprite.data.registries.Registries;
+import com.sprite.data.registries.Registry;
 import com.sprite.data.utils.Utils;
+import com.sprite.data.utils.resources.Resources;
+import com.sprite.data.utils.resources.Texts;
 import com.sprite.game.ItemStack;
 import com.sprite.game.world.World;
 import com.sprite.game.world.entities.Entity;
 import com.sprite.input.InputAction;
 import com.sprite.input.InputSystem;
 import com.sprite.render.ui.UI;
+import com.sprite.resource.Resource;
+import com.sprite.resource.animations.Animation;
+import com.sprite.resource.entities.CollisionData;
 import com.sprite.resource.entities.EntityType;
 import com.sprite.resource.magic.elements.Element;
 import com.sprite.resource.magic.elements.Elements;
@@ -19,6 +28,7 @@ import com.sprite.resource.magic.spells.Spells;
 import com.sprite.resource.texture.GameSprite;
 import org.json.JSONObject;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 
@@ -61,6 +71,7 @@ public class WorldScreen extends GameScreen {
         Entity player = world.spawn(playerType, new Random().nextInt((int) camera().viewportWidth), 200);
         player.health(10);
         player.director.animation("step");
+        player.name(new TranslatableString("Player" + new Random().nextInt(999)));
         System.out.println(player.controller.extra().toString(2));
 
         player.inventory().add(new ItemStack("items:test", 1));
@@ -70,7 +81,7 @@ public class WorldScreen extends GameScreen {
 
 
         EntityType testType = Utils.resources().ENTITIES.load("entities:test");
-        Entity test = world.spawn(testType, new Random().nextInt((int) camera().viewportWidth), 32);
+        Entity test = world.spawn(testType, new Random().nextInt((int) camera().viewportWidth), 100);
         test.health(10);
         test.director.animation("step");
 
@@ -82,9 +93,7 @@ public class WorldScreen extends GameScreen {
     }
 
     @Override
-    public void render(float delta) {
-//        delta = 0;
-        super.render(delta);
+    public void draw(float delta) {
         InputSystem i = InputSystem.i();
         if(camera().focus() != null && camera().focus().inventory().open()){
             handleFocusInput(i);
@@ -96,6 +105,61 @@ public class WorldScreen extends GameScreen {
         }
         handleWorldInput(i);
         camera().update();
+    }
+
+    @Override
+    public void debug(float delta) {
+        sprite().end();
+
+        for(Entity entity : world.entities){
+            GlyphLayout layout = new GlyphLayout(font(), Texts.get(entity.name()));
+            // draw so that the text is centered on (centerX, centerY)
+            float layoutX = (entity.position().x + entity.width()/2) - (layout.width / 2f);
+            float layoutY = (entity.position().y + entity.height()) + (layout.height / 2f);
+            shape().end();
+            shape().begin(ShapeRenderer.ShapeType.Filled);
+            shape().setProjectionMatrix(camera().combined);
+            shape().setColor(0,0,0,0.75f);
+
+            shape().rect(layoutX-2.5f, layoutY-font().getLineHeight()+2, layout.width+5, font().getLineHeight());
+            shape().end();
+            sprite().begin();
+            sprite().setProjectionMatrix(camera().combined);
+            font().draw(sprite(), layout, layoutX, layoutY);
+            sprite().end();
+            shape().begin(ShapeRenderer.ShapeType.Line);
+            shape().setProjectionMatrix(camera().combined);
+
+            //Focused entity is red
+            if(camera().focus() != null && camera().focus().uuid().equals(entity.uuid()))
+                shape().setColor(1, 0, 0, 0.5f);
+            else shape().setColor(1, 1, 1, 0.5f);
+            float ex = entity.position().x;
+            float ey = entity.position().y;
+            Registry<Animation> animations = entity.director.animations;
+            shape().rect(ex, ey , entity.width(), entity.height());
+            for(Animation animation : animations.values()){
+                Animation.FrameData frame = animation.frameArray[animation.frame()];
+                for(String type : frame.collisions()){
+                    CollisionData data = frame.collisions(type);
+                    for(CollisionData.Part part : data.parts){
+                        float scale = entity.width()/entity.model.width;
+                        shape().setColor(0,1,0, 1);
+                        float x = ex + part.from().x*scale;
+                        float y = ey + part.from().y*scale;
+                        float width = part.to().x*scale - part.from().x*scale;
+                        float height = part.to().y*scale - part.from().y*scale;
+                        shape().rect(x, y, width, height);
+                    }
+
+                }
+
+//                animation.frameArray[animation.index].collisions
+            }
+
+
+        }
+        sprite().begin();
     }
 
     private void handleFocusInput(InputSystem i) {
@@ -125,6 +189,7 @@ public class WorldScreen extends GameScreen {
             Entity player = world.spawn(playerType, new Random().nextInt((int) camera().viewportWidth), 200);
             player.health(10);
             player.director.animation("step");
+            player.name(new TranslatableString("Player" + new Random().nextInt(999)));
             System.out.println(player.controller.extra().toString(2));
 
             player.inventory().add(new ItemStack("items:test", 1));

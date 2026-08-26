@@ -1,20 +1,20 @@
 package com.sprite.resource.animations;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.sprite.data.utils.Utils;
 import com.sprite.resource.Resource;
 import com.sprite.resource.ResourceMeta;
 import com.sprite.game.world.entities.Entity;
+import com.sprite.resource.entities.CollisionData;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class Animation {
 
     public final int frames;
     public final int speed;
-    public final JSONObject frameData;
+//    public final JSONObject frameData;
     public final FrameData[] frameArray;
     public final int index;
     public final String name;
@@ -25,11 +25,12 @@ public class Animation {
     public Animation(Resource resource) {
         if(!resource.type().equals(Resource.Type.DATA)) throw new IllegalStateException("Controller resource must be of type DATA");
         ResourceMeta.Json data = (ResourceMeta.Json) resource.data.data();
-        this.frameData = data.get().getJSONObject("frame_data");
+        final JSONObject frameData = data.get().getJSONObject("frame_data");
         this.frames = data.get().getInt("frames");
         this.speed = data.get().getInt("speed");
         this.index = data.get().getInt("index");
         this.name = data.get().optString("name", resource.location().path());
+
 
         //todo fix:
         frameArray = new FrameData[frames];
@@ -48,18 +49,22 @@ public class Animation {
                     if (value == null || value.isEmpty() || value.equalsIgnoreCase("none")) continue;
                     if (frameKey.equalsIgnoreCase("all")) {
                         for (int i = 0; i < frames; i++) {
-                            frameArray[i].collisions.add(value);
+                            frameArray[i].collisions.put(collisionKey, value);
                         }
                         continue;
                     }
                     int index = Integer.parseInt(frameKey);
                     if (index < 0 || index >= frames) continue;
-                    frameArray[index].collisions.add(value);
+                    frameArray[index].collisions.put(collisionKey, value);
                 }
             }
         }
 
 
+    }
+
+    public int frame(){
+        return frame;
     }
 
     public TextureRegion frame(Entity entity) {
@@ -79,12 +84,27 @@ public class Animation {
 
     public static class FrameData {
 
-        public final List<String> collisions = new ArrayList<>();
+        private final Map<String, String> collisions = new HashMap<>();
+        private final Map<String, CollisionData> cache = new HashMap<>();
 
         public final int index;
 
         public FrameData(int index) {
             this.index = index;
+        }
+
+        public List<String> collisions() {
+            return new ArrayList<>(collisions.keySet());
+        }
+
+        public CollisionData collisions(String key) {
+            if(cache.containsKey(key))
+                return cache.get(key);
+            if(!collisions.containsKey(key))
+                throw new IllegalStateException("Collision Box not found: " + key);
+            CollisionData data = Utils.resources().COLLISION_DATA.load(collisions.get(key));
+            cache.put(key, data);
+            return data;
         }
 
     }

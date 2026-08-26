@@ -1,5 +1,6 @@
 package com.sprite.render.screen;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -9,6 +10,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.sprite.data.utils.Utils;
 import com.sprite.data.utils.audio.AudioChannel;
 import com.sprite.data.utils.audio.Sounds;
+import com.sprite.input.InputAction;
 import com.sprite.input.InputSystem;
 import com.sprite.input.VirtualCursor;
 import com.sprite.render.RenderPipeline;
@@ -35,6 +37,8 @@ public abstract class GameScreen implements Screen {
     private BitmapFont font;
     private Color color = new Color(0.1f, 0.1f, 0.12f, 1f);
     private RenderPipeline renderPipeline;
+
+    private boolean debug = false;
 
     @Override
     public void show() {
@@ -97,13 +101,48 @@ public abstract class GameScreen implements Screen {
         camera.update();
         sprite().setProjectionMatrix(camera.combined);
         sprite().begin();
+
+
         renderPipeline.background().render(this, delta);
         renderPipeline.foreground().render(this, delta);
         renderPipeline.ui().render(this, delta);
         VirtualCursor cursor = InputSystem.i().cursor();
         cursor.draw(this);
+        draw(delta);
+
+
+        InputSystem i = InputSystem.i();
+        //Check debug hotkeys
+        if(i.isActionJustPressed(InputAction.DEBUG)){
+            debug = !debug;
+            if(debug && i.isActionPressed(InputAction.CANCEL)){
+                Utils.resources().dump();
+            }
+        }
+
+
+
+        if(debug){
+            debugRenderer.begin(ShapeRenderer.ShapeType.Line);
+            debugRenderer.setColor(Color.RED);
+            debugRenderer.setProjectionMatrix(camera.combined);
+            float x = camera.position.x - camera.viewportWidth/2;
+            float y = camera.position.y + camera.viewportHeight/2;
+
+            font.draw(sprite(), "FPS: " + Gdx.graphics.getFramesPerSecond(), x, y);
+            font.draw(sprite(), "Delta: " + delta, x, y - font.getLineHeight());
+            font.draw(sprite(), "Focus: " + camera.focus(), x, y - font.getLineHeight() * 2);
+
+            debug(delta);
+            debugRenderer.end();
+        }
+
         sprite().end();
     }
+
+    public abstract void debug(float delta);
+
+    public abstract void draw(float delta);
 
     public RenderPipeline pipeline() {
         return renderPipeline;

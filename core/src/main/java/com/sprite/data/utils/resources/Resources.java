@@ -13,6 +13,7 @@ import com.sprite.resource.Resource;
 import com.sprite.resource.ResourceMeta;
 import com.sprite.resource.animations.Animation;
 import com.sprite.resource.controllers.Controller;
+import com.sprite.resource.entities.CollisionData;
 import com.sprite.resource.entities.EntityType;
 import com.sprite.resource.input.Input;
 import com.sprite.resource.items.ItemType;
@@ -108,6 +109,8 @@ public class Resources {
      */
     public final Resource.RegistryAccess<ChunkGenerator> CHUNK_GENERATORS;
 
+    public final Resource.RegistryAccess<CollisionData> COLLISION_DATA;
+
     /**
      * Creates a Resources manager, scanning both internal (classpath) and external (local) assets
      * under the provided root folder.
@@ -141,6 +144,7 @@ public class Resources {
         CONTROLLERS = registerRegistry("controllers", Controller::new);
         MODELS = registerRegistry("models", Model::new);
         ANIMATIONS = registerRegistry("animations", Animation::new);
+        COLLISION_DATA = registerRegistry("collision_data", CollisionData::new);
         TEXTURES = registerRegistry("textures", (location, registry) -> {
             if (registry.get(location).isPresent()) {
                 Gdx.app.debug("Resource", "Texture already loaded: " + location);
@@ -312,5 +316,9 @@ public class Resources {
      */
     public Optional<Resource> get(String resourceLocation) {
         return RESOURCE_REGISTRY.get(resourceLocation);
+    }
+
+    public void dump() {
+        RESOURCE_REGISTRY.forEach((key, value) -> Gdx.app.log("Resource", key + ": " + value));
     }
 }

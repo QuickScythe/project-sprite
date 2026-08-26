@@ -7,6 +7,8 @@ import com.sprite.render.screen.GameScreen;
 import com.sprite.resource.Resource;
 import com.sprite.resource.entities.EntityType;
 
+import java.rmi.registry.Registry;
+
 public class EntityEditor {
 
     private static EntityType type = null;
@@ -37,6 +39,8 @@ public class EntityEditor {
                 Utils.resources().ENTITIES.load("entities:" + resource.location().path());
             }
             buildUI();
+
+
         }
 
         private void type(EntityType type) {
@@ -86,15 +90,15 @@ public class EntityEditor {
 
 
         @Override
-        public void render(float delta) {
+        public void draw(float delta) {
             ScreenUtils.clear(Color.BLACK);
             if (type == null) {
                 ui().draw();
                 return;
             }
 
-            sprite().setProjectionMatrix(camera().combined);
-            sprite().begin();
+//            sprite().setProjectionMatrix(camera().combined);
+//            sprite().begin();
 //            float x = 0;
 //            for(EntityType type : Utils.resources().ENTITIES.all()){
 //
@@ -106,13 +110,18 @@ public class EntityEditor {
             font().draw(sprite(), "This is a test!zxdgfadsgdfsgdsfgsdfgsdfgf", 50,102);
 
 
-            sprite().end();
+//            sprite().end();
 
 //
 //
 //            }
 //
 //            sprite().end();
+        }
+
+        @Override
+        public void debug(float delta) {
+
         }
 
         @Override

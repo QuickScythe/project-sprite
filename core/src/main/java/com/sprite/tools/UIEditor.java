@@ -29,16 +29,11 @@ public class UIEditor {
 
 
         @Override
-        public void render(float delta) {
+        public void draw(float delta) {
             if (Gdx.input.isKeyJustPressed(Input.Keys.K)) {
                 ui().open(ui().build(Utils.resources().USER_INTERFACES.load("ui:furnace")));
             }
-            InputSystem.i().update(delta);
-            ScreenUtils.clear(Color.BLACK);
 
-
-            sprite().setProjectionMatrix(camera().combined);
-            sprite().begin();
             ui().draw();
             screen.sprite().end();
             screen.shape().setProjectionMatrix(screen.camera().combined);
@@ -57,6 +52,12 @@ public class UIEditor {
 //
 //            sprite().end();
         }
+
+        @Override
+        public void debug(float delta) {
+
+        }
+
 
         @Override
         public void resize(int width, int height) {

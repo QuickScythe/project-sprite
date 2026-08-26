@@ -5,8 +5,8 @@
     "all": {
       "collisions": {
         "hit": "none",
-        "hurt": "entity_data:test/hurt",
-        "step": "entity_data:test/step"
+        "hurt": "collision_data:test/hurt",
+        "step": "none"
       }
     }
   }

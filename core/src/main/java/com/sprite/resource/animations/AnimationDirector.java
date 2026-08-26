@@ -15,6 +15,18 @@ public class AnimationDirector {
     private boolean lastFacingRight = true;
 
 
+    public Animation.FrameData currentFrameData(Entity entity) {
+        Animation animation = animations.get(current_animation).orElse(null);
+        if (animation == null) return null;
+        int frameIdx = animation.frame();
+        if (frameIdx < 0 || frameIdx >= animation.frameArray.length) return null;
+        return animation.frameArray[frameIdx];
+    }
+
+    public boolean isFacingRight() {
+        return lastFacingRight;
+    }
+
     public void render(SpriteBatch batch, Entity entity, float x, float y, float width, float height) {
         // Choose animation based on movement state
         float vx = entity.getVelX();

@@ -3,7 +3,7 @@
   "name": "entity.player.name",
   "health": 100,
   "speed": 5.0,
-  "width": 320,
-  "height": 320,
+  "width": 160,
+  "height": 160,
   "controller": "controllers:player"
 }

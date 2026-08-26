@@ -30,6 +30,7 @@ public class MouseKeyboardInputProvider implements InputProvider {
         keybinds.put(InputAction.SUBMIT, new Keybind(InputAction.SUBMIT, true, prefs.getInteger("submit", Input.Keys.ENTER)));
         keybinds.put(InputAction.PRIMARY, new Keybind(InputAction.PRIMARY, false, prefs.getInteger("primary", Input.Buttons.LEFT)));
         keybinds.put(InputAction.SECONDARY, new Keybind(InputAction.SECONDARY, false, prefs.getInteger("secondary", Input.Buttons.RIGHT)));
+        keybinds.put(InputAction.DEBUG, new Keybind(InputAction.DEBUG, true, prefs.getInteger("debug", Input.Keys.F3)));
         prefs.flush();
 
 
