@@ -71,8 +71,13 @@ public class World {
             .put("worldFloorY", worldFloorY)
             .put("generator", generator.data());
 
-        FileHandle options = Gdx.files.local(saveDirectory + "/options.json");
-        options.writeString(data.toString(), false);
+        if (Gdx.files != null && saveDirectory != null) {
+            try {
+                FileHandle options = Gdx.files.local(saveDirectory + "/options.json");
+                options.writeString(data.toString(), false);
+            } catch (Throwable ignored) {
+            }
+        }
 
     }
 
@@ -450,13 +455,15 @@ public class World {
     }
 
     private FileHandle chunkFile(int cx, int cy) {
+        if (Gdx.files == null || saveDirectory == null) return null;
         String name = cx + "_" + cy + ".bin";
         return Gdx.files.local(saveDirectory + "/chunks/" + name);
     }
 
     private void saveChunk(TileChunk chunk) {
-        if (saveDirectory == null) return;
+        if (saveDirectory == null || Gdx.files == null) return;
         FileHandle fh = chunkFile(chunk.chunkX(), chunk.chunkY());
+        if (fh == null) return;
         DataOutputStream out = null;
         try {
             out = new DataOutputStream(fh.write(false));
@@ -481,9 +488,9 @@ public class World {
     }
 
     private TileChunk loadChunk(int cx, int cy) {
-        if (saveDirectory == null) return null;
+        if (saveDirectory == null || Gdx.files == null) return null;
         FileHandle fh = chunkFile(cx, cy);
-        if (!fh.exists()) return null;
+        if (fh == null || !fh.exists()) return null;
         DataInputStream in = null;
         try {
             in = new DataInputStream(fh.read());

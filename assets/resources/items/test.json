@@ -1,3 +1,8 @@
 {
-  "texture": "textures:arrow"
+  "name": "Test Item",
+  "description": "A test item for resource framework verification.",
+  "texture": "textures:arrow",
+  "rarity": "COMMON",
+  "slot": "MATERIAL",
+  "value": 1
 }

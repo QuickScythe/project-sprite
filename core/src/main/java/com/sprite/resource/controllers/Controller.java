@@ -1,21 +1,22 @@
 package com.sprite.resource.controllers;
 
+import com.sprite.resource.DataResource;
 import com.sprite.resource.Resource;
 import com.sprite.resource.ResourceMeta;
 import com.sprite.resource.input.Input;
 import com.sprite.data.utils.Utils;
 import org.json.JSONObject;
 
-public class Controller implements Cloneable {
+public class Controller extends DataResource implements Cloneable {
 
     Input input;
     JSONObject json;
 
 
     public Controller(Resource resource) {
-        if (!resource.type().equals(Resource.Type.DATA))
-            throw new IllegalStateException("Controller resource must be of type DATA");
-        ResourceMeta.Json data = (ResourceMeta.Json) resource.data.data();
+        super(resource);
+
+        ResourceMeta.Json data = meta();
         input = Utils.resources().INPUTS.load(data.get().getString("input"));
 
         json = new JSONObject();

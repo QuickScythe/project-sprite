@@ -18,6 +18,10 @@ import com.sprite.resource.entities.EntityType;
 import com.sprite.resource.input.Input;
 import com.sprite.resource.items.ItemType;
 import com.sprite.resource.loot.LootTable;
+import com.sprite.resource.magic.elements.Element;
+import com.sprite.resource.magic.elements.Elements;
+import com.sprite.resource.magic.spells.Spell;
+import com.sprite.resource.magic.spells.Spells;
 import com.sprite.resource.models.Model;
 import com.sprite.resource.texture.GameSprite;
 import com.sprite.resource.tiles.TileType;
@@ -61,6 +65,10 @@ public class Resources {
      * Registry access wrapper for entity types.
      */
     public final Resource.RegistryAccess<EntityType> ENTITIES;
+    /**
+     * Registry access wrapper for enemy types.
+     */
+     public final Resource.RegistryAccess<com.sprite.game.enemies.EnemyType> ENEMIES;
     /**
      * Registry access wrapper for inputs.
      */
@@ -112,6 +120,16 @@ public class Resources {
     public final Resource.RegistryAccess<CollisionData> COLLISION_DATA;
 
     /**
+     * Registry access wrapper for Magic Elements
+     */
+    public final Resource.RegistryAccess<Element> ELEMENTS;
+
+    /**
+     * Registry access wrapper for Magic Spells
+     */
+    public final Resource.RegistryAccess<Spell> SPELLS;
+
+    /**
      * Creates a Resources manager, scanning both internal (classpath) and external (local) assets
      * under the provided root folder.
      *
@@ -157,6 +175,19 @@ public class Resources {
             return sprite;
         });
         ENTITIES = registerRegistry("entities", EntityType::new);
+        ENEMIES = registerRegistry("enemies", com.sprite.game.enemies.EnemyType::new);
+        ELEMENTS = registerRegistry("elements", (location, registry) -> {
+            if (registry.get(location).isPresent()) {
+                return registry.get(location).get();
+            }
+            return Elements.get(location).orElse(null);
+        });
+        SPELLS = registerRegistry("spells", (location, registry) -> {
+            if (registry.get(location).isPresent()) {
+                return registry.get(location).get();
+            }
+            return Spells.get(location).orElse(null);
+        });
         FileHandle handle = Gdx.files.classpath("assets.txt");
         String read = handle.readString();
         loadInternal(rootFolder, read);
