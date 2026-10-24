@@ -1,5 +1,6 @@
 package com.sprite.resource.models;
 
+import com.sprite.resource.DataResource;
 import com.sprite.resource.Resource;
 import com.sprite.resource.ResourceMeta;
 import com.sprite.resource.animations.Animation;
@@ -10,7 +11,7 @@ import org.json.JSONObject;
 /**
  * Immutable description of a renderable model, including its texture, size, and animations.
  */
-public class Model implements Cloneable {
+public class Model extends DataResource implements Cloneable {
 
     /** Base texture for the model. */
     public final GameSprite texture;
@@ -27,8 +28,8 @@ public class Model implements Cloneable {
      * @param resource model JSON resource
      */
     public Model(Resource resource) {
-        if(!resource.type().equals(Resource.Type.DATA)) throw new IllegalStateException("Controller resource must be of type DATA");
-        ResourceMeta.Json data = (ResourceMeta.Json) resource.data.data();
+        super(resource);
+        ResourceMeta.Json data = meta();
         texture = Utils.resources().TEXTURES.load(data.get().optString("texture", "textures:missing"));
         width = data.get().optInt("width", texture.width());
         height = data.get().optInt("height", texture.height());

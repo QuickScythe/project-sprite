@@ -1,7 +1,7 @@
 {
-  "entity.player.name": "Player",
-  "entity.test.name": "Test Entity",
-  "game.title": "Project Sprite",
+  "entity.player.name": "Hero",
+  "entity.test.name": "Monster",
+  "game.title": "Project Sprite: Realms of Adventure",
   "ui.button.play": "Play",
   "ui.button.options": "Options",
   "ui.button.quit": "Exit",
@@ -13,5 +13,21 @@
   "ui.volume.slider_master": "Master: [0]%",
   "ui.volume.slider_music": "Music: [0]%",
   "ui.volume.slider_sfx": "Effects: [0]%",
-  "ui.volume.slider_ui": "UI: [0]%"
+  "ui.volume.slider_ui": "UI: [0]%",
+  "item.rarity.common": "Common",
+  "item.rarity.uncommon": "Uncommon",
+  "item.rarity.rare": "Rare",
+  "item.rarity.epic": "Epic",
+  "item.rarity.legendary": "Legendary",
+  "item.test.name": "Test Item",
+  "item.mat_slime_gel.name":"Slime Gel",
+  "item.mat_slime_gel.description": "Sticky gel harvested from forest slimes. Useful for alchemy.",
+  "item.mat_goblin_coin.name":"Goblin Coin",
+  "item.mat_goblin_coin.description": "An ancient coin looted from goblin warriors.",
+  "item.mat_arcane_dust.name":"Arcane Dust",
+  "item.mat_arcane_dust.description": "Pulsing dust dropped by skeleton spellcasters.",
+  "item.mat_dark_essence.name":"Dark Essence",
+  "item.mat_dark_essence.description": "A shadowy crystalline core dropped by boss creatures.",
+  "item.mat_scroll_blank.name":"Blank Scroll",
+  "item.mat_scroll_blank.description": "Parchment ready for inscripting memorized elemental spells."
 }

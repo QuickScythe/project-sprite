@@ -13,10 +13,13 @@ public class Registries {
 
     private final static Map<RegistryKey, Registry<?>> registries = new HashMap<>();
     private final static Map<String, RegistryKey> keys = new HashMap<>();
-    private static final ApplicationLogger log = Gdx.app.getApplicationLogger();
+    private static final ApplicationLogger log = Gdx.app != null ? Gdx.app.getApplicationLogger() : null;
 
     public static <T> Registry<T> register(String key, Supplier<T> defaultSupplier) {
-        if (keys.containsKey(key)) throw new IllegalArgumentException("Key already registered: " + key);
+        if (keys.containsKey(key)) {
+            RegistryKey regKey = keys.get(key);
+            return (Registry<T>) registries.get(regKey);
+        }
         RegistryKey registryKey = new RegistryKey(key);
         keys.put(key, registryKey);
         Registry<T> registry = new Registry<>(registryKey);

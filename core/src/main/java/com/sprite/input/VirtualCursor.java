@@ -2,7 +2,7 @@ package com.sprite.input;
 
 import com.badlogic.gdx.math.Vector3;
 import com.sprite.data.utils.Utils;
-import com.sprite.game.ItemStack;
+import com.sprite.game.items.ItemStack;
 import com.sprite.game.world.entities.Entity;
 import com.sprite.render.screen.GameScreen;
 import com.sprite.render.screen.WorldScreen;

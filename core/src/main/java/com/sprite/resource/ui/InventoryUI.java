@@ -26,7 +26,7 @@ public class InventoryUI extends UIType {
         texture = Utils.resources().TEXTURES.load(uiDefinition.texture().toString());
         textureWidth = texture.width() * scale();
         textureHeight = texture.height() * scale();
-        JSONObject uiData = uiDefinition.data().getJSONObject("inventory");
+        JSONObject uiData = uiDefinition.meta().get().getJSONObject("inventory");
         // width corresponds to number of columns; height corresponds to number of rows
         columns = uiData.getInt("width");
         rows = uiData.getInt("height");

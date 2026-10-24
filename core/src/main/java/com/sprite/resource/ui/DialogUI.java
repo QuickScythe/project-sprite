@@ -24,7 +24,7 @@ public class DialogUI extends UIType {
         texture = Utils.resources().TEXTURES.load(uiDefinition.texture().toString());
         textureWidth = texture.width() * scale();
         textureHeight = texture.height() * scale();
-        JSONObject uiData = uiDefinition.data().getJSONObject("dialog");
+        JSONObject uiData = uiDefinition.meta().get().getJSONObject("dialog");
         columns = uiData.getInt("columns");
         rows = uiData.getInt("rows");
         gridWidthSize = textureWidth / columns;

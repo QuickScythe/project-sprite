@@ -2,6 +2,7 @@ package com.sprite.resource.animations;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.sprite.data.utils.Utils;
+import com.sprite.resource.DataResource;
 import com.sprite.resource.Resource;
 import com.sprite.resource.ResourceMeta;
 import com.sprite.game.world.entities.Entity;
@@ -10,7 +11,7 @@ import org.json.JSONObject;
 
 import java.util.*;
 
-public class Animation {
+public class Animation extends DataResource {
 
     public final int frames;
     public final int speed;
@@ -23,8 +24,9 @@ public class Animation {
     long update = 0;
 
     public Animation(Resource resource) {
-        if(!resource.type().equals(Resource.Type.DATA)) throw new IllegalStateException("Controller resource must be of type DATA");
-        ResourceMeta.Json data = (ResourceMeta.Json) resource.data.data();
+        super(resource);
+
+        ResourceMeta.Json data = meta();
         final JSONObject frameData = data.get().getJSONObject("frame_data");
         this.frames = data.get().getInt("frames");
         this.speed = data.get().getInt("speed");

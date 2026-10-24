@@ -88,6 +88,9 @@ public abstract class GameScreen implements Screen {
     public void dispose() {
         if (sprite != null) sprite.dispose();
         if (debugRenderer != null) debugRenderer.dispose();
+        if (renderPipeline != null && renderPipeline.shaderLayer() != null) {
+            renderPipeline.shaderLayer().dispose();
+        }
     }
 
     public abstract void create();
@@ -96,6 +99,7 @@ public abstract class GameScreen implements Screen {
     public void render(float delta) {
         // Update high-level input first so just-pressed works for this frame
         InputSystem.i().update(delta);
+        renderPipeline.update(delta);
 
         ScreenUtils.clear(color);
         camera.update();
@@ -105,6 +109,10 @@ public abstract class GameScreen implements Screen {
 
         renderPipeline.background().render(this, delta);
         renderPipeline.foreground().render(this, delta);
+        renderPipeline.particles().render(this, delta);
+        renderPipeline.lights().render(this, delta);
+        renderPipeline.shader().render(this, delta);
+        renderPipeline.postProcess().render(this, delta);
         renderPipeline.ui().render(this, delta);
         VirtualCursor cursor = InputSystem.i().cursor();
         cursor.draw(this);

@@ -4,13 +4,14 @@ import com.sprite.data.Taggable;
 import com.sprite.data.TranslatableString;
 import com.sprite.data.utils.Utils;
 import com.sprite.data.utils.resources.Texts;
+import com.sprite.resource.DataResource;
 import com.sprite.resource.Resource;
 import com.sprite.resource.ResourceMeta;
 import com.sprite.resource.loot.LootTable;
 import com.sprite.resource.texture.GameSprite;
 import org.json.JSONArray;
 
-public class TileType implements Taggable {
+public class TileType extends DataResource implements Taggable {
 
     private final Resource.Location location;
     private final GameSprite texture;
@@ -20,8 +21,8 @@ public class TileType implements Taggable {
     private final String[] tags;
 
     public TileType(Resource resource) {
-        if(!resource.type().equals(Resource.Type.DATA)) throw new IllegalStateException("Tile resource must be of type DATA");
-        ResourceMeta.Json data = (ResourceMeta.Json) resource.data.data();
+        super(resource);
+        ResourceMeta.Json data = meta();
         texture = Utils.resources().TEXTURES.load(data.get().optString("texture", "textures:missing"));
         hardness = data.get().getFloat("hardness");
         name = new TranslatableString(data.get().getString("name"));
@@ -45,7 +46,7 @@ public class TileType implements Taggable {
         return texture;
     }
 
-    public Resource.Location resource() {
+    public Resource.Location location() {
         return location;
     }
 

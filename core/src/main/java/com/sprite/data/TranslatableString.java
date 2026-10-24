@@ -27,7 +27,18 @@ public record TranslatableString(String key) {
      */
     @Override
     public String toString() {
-        Texts.get(this);
+        return Texts.get(this);
+    }
+
+    public String translated() {
+        return toString();
+    }
+
+    public String key() {
         return key;
+    }
+
+    public boolean isEmpty() {
+        return key == null || key.isEmpty();
     }
 }

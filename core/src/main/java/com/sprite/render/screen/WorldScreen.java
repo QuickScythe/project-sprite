@@ -9,15 +9,14 @@ import com.sprite.data.TranslatableString;
 import com.sprite.data.registries.Registries;
 import com.sprite.data.registries.Registry;
 import com.sprite.data.utils.Utils;
-import com.sprite.data.utils.resources.Resources;
 import com.sprite.data.utils.resources.Texts;
-import com.sprite.game.ItemStack;
+import com.sprite.game.Game;
+import com.sprite.game.items.ItemStack;
 import com.sprite.game.world.World;
 import com.sprite.game.world.entities.Entity;
 import com.sprite.input.InputAction;
 import com.sprite.input.InputSystem;
 import com.sprite.render.ui.UI;
-import com.sprite.resource.Resource;
 import com.sprite.resource.animations.Animation;
 import com.sprite.resource.entities.CollisionData;
 import com.sprite.resource.entities.EntityType;
@@ -28,7 +27,6 @@ import com.sprite.resource.magic.spells.Spells;
 import com.sprite.resource.texture.GameSprite;
 import org.json.JSONObject;
 
-import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 
@@ -39,6 +37,7 @@ public class WorldScreen extends GameScreen {
 
     World world;
     GameSprite background;
+    Game game;
 
     @Override
     public void create() {
@@ -51,39 +50,44 @@ public class WorldScreen extends GameScreen {
         else{
             world = new World(new World.Builder("test"));
         }
+        game = new Game(world);
+        game.setParticleSystem(pipeline().particleSystem());
+        game.setLightingSystem(pipeline().lightingSystem());
+
+        // Configure atmospheric lighting and bloom
+        pipeline().lightingSystem().setTileSize(world.tileSize());
+        pipeline().lightingSystem().setAmbientColor(0.04f, 0.04f, 0.08f, 0.45f);
+        pipeline().shaderLayer().setBloomEnabled(true);
+        pipeline().shaderLayer().setBloomIntensity(1.3f);
+        pipeline().shaderLayer().setBloomThreshold(0.55f);
+        pipeline().shaderLayer().setBloomColor(new com.badlogic.gdx.graphics.Color(0.25f, 0.8f, 1.0f, 1.0f));
+
+        // Ambient light from above casting real dynamic shadows
+        com.sprite.render.lighting.DirectionalLight overheadAmbientLight = new com.sprite.render.lighting.DirectionalLight(
+            0f, -1f, new com.badlogic.gdx.graphics.Color(1.0f, 0.98f, 0.92f, 0.2f), 0.85f, true
+        );
+        overheadAmbientLight.setShadowLength(world.tileSize() * 8f);
+        pipeline().lightingSystem().addLight(overheadAmbientLight);
+
         background = Utils.resources().TEXTURES.load("textures:background");
         pipeline().background((screen, delta) -> {
             screen.sprite().draw(background.sprite(), 0, 0, camera().viewportWidth, camera().viewportHeight);
         });
         pipeline().foreground((screen, delta) -> {
-            // Handle simple movement for the currently focused entity using the InputSystem
-            // Default keyboard mapping uses WASD/Arrow keys via MouseKeyboardInputProvider
-
-
             // Step world and render
             world.render(screen);
         });
         pipeline().ui((screen, delta) -> {
             ui().draw();
+            game.render(screen);
         });
 
         EntityType playerType = Utils.resources().ENTITIES.load("entities:player");
-        Entity player = world.spawn(playerType, new Random().nextInt((int) camera().viewportWidth), 200);
-        player.health(10);
+        Entity player = world.spawn(playerType, 120, 200);
         player.director.animation("step");
-        player.name(new TranslatableString("Player" + new Random().nextInt(999)));
-        System.out.println(player.controller.extra().toString(2));
-
-        player.inventory().add(new ItemStack("items:test", 1));
-//                player.inventory().put(1, new ItemStack(Utils.resources().ITEMS.load("items:test"), 1));
+        game.initPlayer(player);
 
         camera().focus(player);
-
-
-        EntityType testType = Utils.resources().ENTITIES.load("entities:test");
-        Entity test = world.spawn(testType, new Random().nextInt((int) camera().viewportWidth), 100);
-        test.health(10);
-        test.director.animation("step");
 
         requestMusic();
     }
@@ -92,9 +96,19 @@ public class WorldScreen extends GameScreen {
         return world;
     }
 
+    public Game game() {
+        return game;
+    }
+
+    public Game rpg() {
+        return game;
+    }
+
     @Override
     public void draw(float delta) {
         InputSystem i = InputSystem.i();
+        game.update(delta);
+        updateShadowCasters();
         if(camera().focus() != null && camera().focus().inventory().open()){
             handleFocusInput(i);
             return;
@@ -103,8 +117,75 @@ public class WorldScreen extends GameScreen {
             handleUIInput(i);
             return;
         }
+        game.handleInput(this);
         handleWorldInput(i);
         camera().update();
+    }
+
+    private void updateShadowCasters() {
+        if (world == null || pipeline() == null || pipeline().lightingSystem() == null) return;
+        com.sprite.render.lighting.LightingSystem lighting = pipeline().lightingSystem();
+        if (!lighting.isEnabled() || !lighting.isShadowsEnabled()) return;
+
+        lighting.clearShadowCasters();
+        if (lighting.getLights().isEmpty()) return;
+
+        int ts = world.tileSize();
+        boolean hasDirectionalShadowLight = false;
+
+        for (com.sprite.render.lighting.Light light : lighting.getLights()) {
+            if (!light.isActive() || !light.isCastsShadows()) continue;
+
+            if (light instanceof com.sprite.render.lighting.DirectionalLight) {
+                hasDirectionalShadowLight = true;
+                continue;
+            }
+
+            float lx = light.getX();
+            float ly = light.getY();
+            float radius = light instanceof com.sprite.render.lighting.PointLight ? ((com.sprite.render.lighting.PointLight) light).getRadius() : 250f;
+
+            int minTx = (int) Math.floor((lx - radius) / ts);
+            int maxTx = (int) Math.ceil((lx + radius) / ts);
+            int minTy = (int) Math.floor((ly - radius) / ts);
+            int maxTy = (int) Math.ceil((ly + radius) / ts);
+
+            for (int tx = minTx; tx <= maxTx; tx++) {
+                for (int ty = minTy; ty <= maxTy; ty++) {
+                    if (world.isSolid(world.getTileId(tx, ty))) {
+                        lighting.addShadowCaster(new com.sprite.render.lighting.ShadowCaster(tx * ts, ty * ts, ts, ts));
+                    }
+                }
+            }
+        }
+
+        if (hasDirectionalShadowLight && camera() != null) {
+            float camLeft = camera().position.x - camera().viewportWidth / 2f;
+            float camBottom = camera().position.y - camera().viewportHeight / 2f;
+            int minTx = (int) Math.floor((camLeft - ts) / ts);
+            int maxTx = (int) Math.ceil((camLeft + camera().viewportWidth + ts) / ts);
+            int minTy = (int) Math.floor((camBottom - ts) / ts);
+            int maxTy = (int) Math.ceil((camBottom + camera().viewportHeight + ts) / ts);
+
+            for (int tx = minTx; tx <= maxTx; tx++) {
+                for (int ty = minTy; ty <= maxTy; ty++) {
+                    if (world.isSolid(world.getTileId(tx, ty))) {
+                        float cx = tx * ts;
+                        float cy = ty * ts;
+                        boolean alreadyAdded = false;
+                        for (com.sprite.render.lighting.ShadowCaster sc : lighting.getShadowCasters()) {
+                            if (sc.getBounds().x == cx && sc.getBounds().y == cy) {
+                                alreadyAdded = true;
+                                break;
+                            }
+                        }
+                        if (!alreadyAdded) {
+                            lighting.addShadowCaster(new com.sprite.render.lighting.ShadowCaster(cx, cy, ts, ts));
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Override

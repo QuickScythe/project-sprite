@@ -5,9 +5,11 @@ import com.badlogic.gdx.files.FileHandle;
 import com.sprite.data.registries.Registries;
 import com.sprite.data.registries.Registry;
 import com.sprite.data.utils.Utils;
+import org.json.JSONObject;
 
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static com.sprite.resource.Resource.Type.DATA;
@@ -65,21 +67,18 @@ public class Resource {
                 this.data = new Data(type(), new ResourceMeta.Sound(file));
             }
         }
-        switch (type()) {
-            case TEXTURE:
-                this.data = new Data(type(), new ResourceMeta.Texture(file));
-                break;
 
-            case DATA:
-                this.data = new Data(type(), new ResourceMeta.Json(file));
-                break;
+    }
 
-            case SOUND:
-                this.data = new Data(type(), new ResourceMeta.Sound(file));
-                break;
-
-        }
-
+    /**
+     * Create a pseudo data resource.
+     */
+    @Deprecated
+    public Resource(JSONObject data){
+        this.location = new Resource.Location("internal", "data");
+        this.file = null;
+        this.internal = true;
+        this.data = new Data(DATA, new ResourceMeta.Json(data));
     }
 
     /**
@@ -236,8 +235,12 @@ public class Resource {
                 return registry.get(location).get();
             }
             Gdx.app.log("Resource", "Loading " + key() + ": " + location);
-            Resource raw = Utils.resources().get(location).orElseThrow();
-            T resource = creator.apply(raw);
+            Optional<Resource> rawOptional = Utils.resources().get(location);
+            if(rawOptional.isEmpty()){
+                Gdx.app.error("Resource", "Resource not found: " + location);
+                return null;
+            }
+            T resource = creator.apply(rawOptional.get());
             registry.register(location, resource);
             return resource;
         }
